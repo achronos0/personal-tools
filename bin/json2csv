@@ -1,0 +1,211 @@
+#!/usr/bin/env node
+
+const { isAbsolute } = require('path')
+
+run()
+
+async function run () {
+	if (process.stdin.isTTY) {
+		die('no data source provided', true)
+	}
+	process.stdout.on('close', () => {
+		process.exit()
+	})
+	process.stdout.on('error', () => {
+		process.exit()
+	})
+	let jsonData
+	try {
+		jsonData = JSON.parse(await input())
+	}
+	catch (err) {
+		die(err.message)
+	}
+	jsonData = transformData(jsonData)
+	if (!jsonData.length) {
+		process.stdout.write('')
+		return
+	}
+	const keysFound = {}
+	const columns = []
+	const rows = []
+	for (const jsonElement of jsonData) {
+		for (const key in jsonElement) {
+			if (!keysFound[key]) {
+				keysFound[key] = true
+				columns.push(key)
+			}
+		}
+		const row = []
+		for (const key of columns) {
+			row.push(jsonElement[key])
+		}
+		rows.push(row)
+	}
+	rows.unshift(columns)
+	process.stdout.write(makeCsv(rows))
+}
+
+function transformProcessor (obj) {
+	/*
+	// [2022-05] jenkins job export, pluck all nested job objects from tree
+	// URL: http://jenkinsprod.klick.com:8080/api/json?pretty=true&tree=jobs[name,url,scm[userRemoteC[%E2%80%A6]igs[url]],jobs[name,url,scm[userRemoteConfigs[url]]]]]]
+	if (obj._class === 'hudson.model.FreeStyleProject') {
+		return {
+			name: obj.name,
+			jenkinsUrl: obj.url,
+			githubUrl: (obj.scm && obj.scm.userRemoteConfigs) ? obj.scm.userRemoteConfigs.map(o => o.url).join('\n') : null
+		}
+	}
+	*/
+
+	// [2022-05] `kt veeva-vault vault document list <search-term> --format=json`
+	if (obj.documents) {
+		return obj.documents.map(el => el.document)
+	}
+
+	// Default behaviour: walk array, output each object as record
+	return Array.isArray(obj) ? false : obj
+}
+
+function transformData (inputData) {
+	const outputData = []
+	walk(inputData)
+	return outputData
+	function walk (val) {
+		if (!val || (typeof val) !== 'object') {
+			return
+		}
+		const res = transformProcessor(val, outputData)
+		if (res) {
+			if ((typeof res) === 'object') {
+				if (Array.isArray(res)) {
+					outputData.splice(outputData.length, 0, ...res)
+				}
+				else {
+					outputData.push(res)
+				}
+			}
+			return
+		}
+		if (Array.isArray(val)) {
+			for (const el of val) {
+				walk(el)
+			}
+			return
+		}
+		for (const prop in val) {
+			if ((typeof val[prop]) === 'object') {
+				walk(val[prop])
+			}
+		}
+	}
+}
+
+function makeCsv (rows) {
+	const RECORD_SEPARATOR = '\n'
+	const FIELD_SEPARATOR = ','
+	const ENCLOSE = '"'
+	const ENCLOSE_ESCAPE = ENCLOSE + ENCLOSE
+	const VALUE_NULL = ''
+	const VALUE_EMPTY_STRING = ''
+	const VALUE_TRUE = 'TRUE'
+	const VALUE_FALSE = 'FALSE'
+	const VALUE_LIST_SEPARATOR = ','
+	const VALUE_OBJECT = ''
+	const VALUE_INVALID_JSON = ''
+
+	return rows.map(row =>
+		row
+			.map(value => value2csv(value))
+			.join(FIELD_SEPARATOR)
+	).join(RECORD_SEPARATOR) + RECORD_SEPARATOR
+
+	function value2csv (value) {
+		// null
+		if (value == null) {
+			return VALUE_NULL
+		}
+		// boolean
+		if (value === true) {
+			return VALUE_TRUE
+		}
+		if (value === false) {
+			return VALUE_FALSE
+		}
+		// empty string
+		if (value === '') {
+			return VALUE_EMPTY_STRING
+		}
+		// anything else must be converted to string and potentially be escaped and enclosed
+		switch (typeof value) {
+			// non-empty string
+			case 'string': {
+				// iso datetime: "2022-05-19T21:05", "2022-05-19T21:05:22", "2022-05-19T21:05:22.000Z"
+				const m = /^(\d\d\d\d-\d\d-\d\d)[ T](\d\d:\d\d(?::\d\d)?)(?:\.\d+)?Z?/.exec(value)
+				if (m) {
+					value = m[1] + ' ' + m[2]
+				}
+				break
+			}
+			// number
+			case 'number':
+				value = value.toString()
+				break;
+			// array or object
+			case 'object':
+				// array of scalars
+				if (isList(value)) {
+					value = value.join(VALUE_LIST_SEPARATOR)
+				}
+				// any other array or object
+				else if (VALUE_OBJECT === 'json') {
+					value = JSON.stringify(value)
+				}
+				else {
+					value = VALUE_OBJECT
+				}
+				break;
+			// anything else
+			default:
+				value = VALUE_INVALID_JSON
+		}
+		// escape and enclose string, if necessary
+		if (
+			value.indexOf(FIELD_SEPARATOR) !== -1 ||
+			value.indexOf(RECORD_SEPARATOR) !== -1
+		) {
+			value = ENCLOSE + value.replaceAll(ENCLOSE, ENCLOSE_ESCAPE) + ENCLOSE
+		}
+		return value
+	}
+
+	function isList (value) {
+		if (!Array.isArray(value)) {
+			return false
+		}
+		for (const el of value) {
+			if ((typeof el) === 'object') {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+async function input () {
+	let buffer = ''
+	return new Promise((resolve, reject) => {
+		process.stdin.on('data', data => {
+			buffer += data
+		})
+		process.stdin.on('end', () => {
+			resolve(buffer)
+		})
+	})
+}
+
+function die (message, showUsage = false) {
+	process.stderr.write(`json2csv: ${message}\n`)
+	process.exit(1)
+}

@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# create_selfsigned_ssl <hostname>
+
+# config
+INFO_EMAIL="${INFO_EMAIL:-kpatterson@klick.com}"
+INFO_COUNTRY="${INFO_COUNTRY:-CA}"
+INFO_STATE="${INFO_STATE:-ON}"
+INFO_CITY="${INFO_CITY:-Toronto}"
+INFO_ORGANIZATION="${INFO_ORGANIZATION:-Klick Inc}"
+INFO_ORG_UNIT="${INFO_ORG_UNIT:-dev}"
+
+# help
+usage () {
+	cat <<EOF
+Usage: $(basename $0) <hostname> [dir]
+
+Generate a self-signed website SSL key and certificate
+
+Arguments:
+  hostname      Website domain to sign, e.g. "dev.example.com"
+  dir           Directory to store key and cert in, default is current directory
+
+EOF
+}
+if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]] ; then
+	usage
+	exit 2
+fi
+
+# get args
+HOSTNAME=$1
+DIR=${2:-.}
+
+# generate password
+CERT_AUTH_PASS=`openssl rand -base64 32`
+echo $CERT_AUTH_PASS > $DIR/$HOSTNAME.ca-cert.key.password
+CERT_AUTH_PASS=`cat $DIR/$HOSTNAME.ca-cert.key.password`
+
+# create openssl config file for certificate
+cat > $DIR/$HOSTNAME.csr-config.cnf <<EOF
+HOME                    = .
+RANDFILE                = $ENV::HOME/.rnd
+
+[ req ]
+default_bits            = 2048
+distinguished_name      = req_distinguished_name
+attributes              = req_attributes
+prompt                  = no
+req_extensions          = v3_req
+
+[ req_distinguished_name ]
+countryName             = $INFO_COUNTRY
+stateOrProvinceName     = $INFO_STATE
+localityName            = $INFO_CITY
+organizationName        = $INFO_ORGANIZATION
+organizationalUnitName  = $INFO_ORG_UNIT
+commonName              = $HOSTNAME
+emailAddress            = $INFO_EMAIL
+
+[ req_attributes ]
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = clientAuth,serverAuth
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = $HOSTNAME
+DNS.2 = www.$HOSTNAME
+EOF
+
+# create the certificate authority
+openssl \
+	req \
+	-subj "/CN=$HOSTNAME.ca-cert/OU=$INFO_ORG_UNIT/O=$INFO_ORGANIZATION/L=$INFO_CITY/ST=$INFO_STATE/C=$INFO_COUNTRY/emailAddress=$INFO_EMAIL" \
+	-new \
+	-x509 \
+	-passout pass:$CERT_AUTH_PASS \
+	-keyout $DIR/$HOSTNAME.ca-cert.key \
+	-out $DIR/$HOSTNAME.ca-cert.crt \
+	-days 36500
+
+# create client private key (used to decrypt the cert we get from the CA)
+openssl genrsa -out $DIR/$HOSTNAME.key
+
+# create the CSR (Certitificate Signing Request)
+openssl \
+	req \
+	-new \
+	-nodes \
+	-subj "/CN=$HOSTNAME/OU=$INFO_ORG_UNIT/O=$INFO_ORGANIZATION/L=$INFO_CITY/ST=$INFO_STATE/C=$INFO_COUNTRY" \
+	-sha256 \
+	-key $DIR/$HOSTNAME.key \
+	-out $DIR/$HOSTNAME.csr \
+	-config $DIR/$HOSTNAME.csr-config.cnf \
+	-days 36500
+
+# sign the certificate with the certificate authority
+openssl \
+	x509 \
+	-req \
+	-days 36500 \
+	-in $DIR/$HOSTNAME.csr \
+	-CA $DIR/$HOSTNAME.ca-cert.crt \
+	-CAkey $DIR/$HOSTNAME.ca-cert.key \
+	-CAcreateserial \
+	-out $DIR/$HOSTNAME.crt \
+	-extfile $DIR/$HOSTNAME.csr-config.cnf \
+	-extensions v3_req \
+	-passin pass:$CERT_AUTH_PASS

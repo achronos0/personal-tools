@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# help
+usage () {
+	cat <<EOF
+Usage: $(basename $0) <name> [dir] [filename]
+
+Generate an SSH key pair
+
+Arguments:
+  name          Name for key e.g. "jsmith-laptop" or "jsmith-aws-servers"
+  dir           Directory to store key in, default is \$HOME/.ssh
+  filename      Key filename, default is "id_rsa" if it doesn't exist, otherwise <name> + ".id_rsa"
+
+EOF
+}
+if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]] ; then
+	usage
+	exit 2
+fi
+
+# get args
+KEYNAME=$1
+DIR=${2:-$HOME/.ssh}
+FILENAME=$3
+
+# create dir
+if [[ ! -d "$DIR" ]] ; then
+	mkdir -p "$DIR" || exit $?
+	chmod 0700 "$DIR" || exit $?
+fi
+
+if [[ -z "$FILENAME" ]] ; then
+	if [[ ! -f "$DIR/id_rsa" ]] ; then
+		FILENAME=id_rsa
+	else
+		FILENAME="$KEYNAME.id_rsa"
+	fi
+fi
+
+if [[ -f "$DIR/$FILENAME" ]] ; then
+	echo -en "Error: key already exists $DIR/$FILENAME\n" 1>&2
+	exit 1
+fi
+
+YEAR=`date +%Y`
+ssh-keygen -t rsa -b 4096 -N "" -C "$KEYNAME-ssh-$YEAR" -f "$DIR/$FILENAME" || exit $?

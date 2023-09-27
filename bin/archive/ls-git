@@ -1,0 +1,43 @@
+#!/bin/bash
+
+if [[ "$1" == "-h" || "$1" == "--help" ]] ; then
+	echo "Usage: $0 <git-dir...>"
+	exit 2
+fi
+
+echo_grey () {
+	[[ -t 1 ]] && tput setaf 8
+	echo $*
+	[[ -t 1 ]] && tput sgr 0
+}
+
+show_git_info () {
+	git fetch
+	if [[ $? != 0 ]] ; then return ; fi
+	git show --abbrev-commit --summary --format=oneline --no-patch
+	if [[ $? != 0 ]] ; then return ; fi
+	git status --short --branch
+}
+
+show_dir () {
+	local DIR="$1"
+	echo
+	echo_grey $DIR
+	cd "$DIR"
+	show_git_info "$1"
+	cd - >/dev/null
+}
+
+ARGS=$*
+[[ -z "$ARGS" ]] && ARGS=.
+DIRS=()
+for DIR in $ARGS
+do
+	DIRS=$DIRS$'\n'$(find $DIR -type d -name node_modules -prune -o -type d -name .git -print -prune)
+done
+DIRS=$(echo "$DIRS" | sort --unique)
+IFS=$'\n'
+for DIR in $DIRS
+do
+	show_dir "$(dirname $DIR)"
+done

@@ -1,0 +1,84 @@
+#!/usr/bin/env node
+
+run()
+
+async function run () {
+	if (process.argv[2] && process.argv[2].match(/^--|^-h$/)) {
+		usage()
+		process.exit()
+	}
+	if (process.argv.length !== 3) {
+		die('exactly one argument is required', true)
+	}
+	if (process.stdin.isTTY) {
+		die('no data source provided', true)
+	}
+	process.stdout.on('close', () => {
+		process.exit()
+	})
+	process.stdout.on('error', () => {
+		process.exit()
+	})
+	const filter = getFilterFn()
+	for (let line of await lines()) {
+		line = filter(line)
+		process.stdout.write(line + '\n')
+	}
+}
+
+function sort (data) {
+	try {
+		return data.sort(sorter())
+	}
+	catch (err) {
+		die(`sort function error: ${err.message}`)
+	}
+}
+
+function getFilterFn () {
+	let code = process.argv[2]
+	if (!/\breturn\b|=>|\{/.test(code)) {
+		code = `(function (line) { return (${code}) })`
+	}
+	let fn
+	try {
+		fn = eval(code)
+	}
+	catch (err) {
+		die(`syntax error: ${err.message}`)
+	}
+	return fn
+}
+
+async function lines () {
+	const lines = []
+	let buffer = ''
+	return new Promise((resolve, reject) => {
+		process.stdin.on('data', data => {
+			buffer += data
+			let m
+			while ((m = /^(.*?)(?:\r\n|\n)/.exec(buffer))) {
+				lines.push(m[1])
+				buffer = buffer.substring(m[0].length)
+			}
+		})
+		process.stdin.on('end', () => {
+			if (buffer !== '') {
+				lines.push(buffer)
+			}
+			resolve(lines)
+		})
+	})
+}
+
+function die (message, showUsage = false) {
+	process.stderr.write(`nodepipe: ${message}\n`)
+	if (showUsage && process.stdout.isTTY) {
+		usage()
+	}
+	process.exit(1)
+}
+
+function usage () {
+	process.stdout.write("\nUsage: nodepipe \"<js_expression>\" < input > output\n\nExamples:\n    nodepipe \"line.replace(/foo/g, 'bar')\" < lines.txt > lines_foo_means_bar.txt\n    nodepipe 'line.substring(0, 10)' < lines.txt > lines_truncated_to_10_chars.txt\n\n")
+}

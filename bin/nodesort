@@ -1,0 +1,82 @@
+#!/usr/bin/env node
+
+run()
+
+async function run () {
+	if (process.argv[2] && process.argv[2].match(/^--|^-h$/)) {
+		usage()
+		process.exit()
+	}
+	if (process.argv.length !== 3) {
+		die('exactly one argument is required', true)
+	}
+	if (process.stdin.isTTY) {
+		die('no data source provided', true)
+	}
+	process.stdout.on('close', () => {
+		process.exit()
+	})
+	process.stdout.on('error', () => {
+		process.exit()
+	})
+	for (const line of sort(await lines())) {
+		process.stdout.write(line + '\n')
+	}
+}
+
+function sort (data) {
+	try {
+		return data.sort(sorter())
+	}
+	catch (err) {
+		die(`sort function error: ${err.message}`)
+	}
+}
+
+function sorter () {
+	let code = process.argv[2]
+	if (!/\breturn\b|=>|\{/.test(code)) {
+		code = `(function (a, b) { return (${code}) })`
+	}
+	let fn
+	try {
+		fn = eval(code)
+	}
+	catch (err) {
+		die(`syntax error: ${err.message}`)
+	}
+	return fn
+}
+
+async function lines () {
+	const lines = []
+	let buffer = ''
+	return new Promise((resolve, reject) => {
+		process.stdin.on('data', data => {
+			buffer += data
+			let m
+			while ((m = /^(.*?)(?:\r\n|\n)/.exec(buffer))) {
+				lines.push(m[1])
+				buffer = buffer.substring(m[0].length)
+			}
+		})
+		process.stdin.on('end', () => {
+			if (buffer !== '') {
+				lines.push(buffer)
+			}
+			resolve(lines)
+		})
+	})
+}
+
+function die (message, showUsage = false) {
+	process.stderr.write(`nodesort: ${message}\n`)
+	if (showUsage && process.stdout.isTTY) {
+		usage()
+	}
+	process.exit(1)
+}
+
+function usage () {
+	process.stdout.write("\nUsage: nodesort \"<sort_js_expression>\" < input > output\n\nExamples:\n    find . | nodesort 'a.localeCompare(b)' > alphabetized_dir_tree.txt\n    nodesort 'a.length - b.length' < lines.txt > lines_short_to_long.txt\n\n")
+}
