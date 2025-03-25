@@ -82,7 +82,7 @@
 #    l
 #        Because sometimes even ll is too long.
 #    lt [dir...]
-#        List directory tree recursively as a hierarchy (requires `exa` to be installed).
+#        List directory tree recursively as a hierarchy (requires `eza` to be installed).
 #    f <text>
 #        Find files containing text, in current directory and recursively in subdirectories.
 #    r <regexp>
@@ -330,8 +330,8 @@ macos_shell_helper () {
 			alias ll='ls -FGlAhp'
 		fi
 		alias l='ll'
-		if [[ $(whence exa) ]] ; then
-			alias lt='exa --long --group-directories-first --sort=Name --tree'
+		if [[ $(whence eza) ]] ; then
+			alias lt='eza --long --group-directories-first --sort=Name --tree'
 		fi
 		alias f="fgrep --recursive --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=build --exclude-dir=dist --exclude=package-lock.json"
 		alias r="grep --recursive --exclude-dir=node_modules --exclude-dir=.git"
