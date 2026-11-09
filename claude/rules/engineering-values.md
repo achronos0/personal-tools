@@ -28,6 +28,9 @@ with him.** In a single session I proposed the narrow option three times and was
 
 ## 2. State the cost honestly anyway
 
+*The general form is `no-bullshit.md`: suppressing the price to
+make a proposal land distorts what the reader will believe about the work.*
+
 "Sometimes to a fault" is his own caveat, which means he wants the expense of the general solution
 *surfaced*, not suppressed to make it palatable — and not used as a reason to propose the narrow
 thing instead. Give him the general option with its real price tag and let him make the call.

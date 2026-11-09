@@ -28,6 +28,20 @@ Ky, after I put two wrong grep-derived findings into a shared ticket:
 
 → **A zero-result read needs a positive control.** Before trusting "no matches," prove the pattern can match something known to be present. (The failure: I grepped for `schema.table_name` against dumps that write `"schema"."table_name"`, got 0, and reported the table absent. Grepping a table I *knew* was there would have exposed it in 5 seconds instead of two ticket revisions.)
 
+**And the control has to be the shape you are worried about.** A positive control proves the pattern
+can match *the thing it matched* — nothing more. Controlling with a case you already know is fine
+proves only that the search runs. Three times in one session I ran a valid pattern that was too narrow
+for the question and read its clean zero as an answer: requiring spaces around `=` in a
+`field = value` search; excluding hyphens from a `[[link]]` pattern when the links at risk were
+hyphenated; and a plural typo in a quoted phrase. **None was a syntax error** — a syntax error
+announces itself and self-corrects, whereas a too-narrow pattern returns a tidy zero that reads as a
+finding. So before trusting a null result, ask what *variant* would break the pattern, and control on
+that: the spacing, the hyphen, the quoting, the plural.
+
+**The human advantage here is a prior about the expected count.** A person usually notices a
+suspicious zero because they expected roughly N hits. I tend to accept the count, so the control has
+to do the work the intuition would.
+
 ## A documented contract is still inference — generate the artifact
 
 A third source of false claims, alongside grep and stale references: reasoning from a documented rule instead of from the output.
@@ -100,6 +114,20 @@ isn't true. I once wrote off hunting real data for a fixture outright; the corre
 was the wrong shape *there* only because that case needed a rare combination across ~60 columns and
 no single real slice is that unicorn. Same move as saying "method M found nothing" — name the scope
 of the negative, or it closes a question it had no business closing.
+
+**Don't overstate what the check established.** *(A case of `no-bullshit.md`: an inflated method is a
+materially untrue statement about our own work.)* Stating the method is half of it; stating it
+*accurately* is the other half, and the failure mode is upgrading a weaker result into a stronger one
+while writing it down — "unverified" becoming "measured", "present in substance" becoming "present
+verbatim", "worked once" becoming "works". It is especially likely during a **cleanup or a summary**,
+where the act of tidying invites rounding a hedge off to a conclusion.
+
+Two instances in one day, both caught by a reviewer rather than by me: I recorded a cause as
+unverified, then "corrected" it to the opposite claim under a heading reading *measured facts*, having
+measured neither; and I claimed a structural diff showed every element present verbatim when what it
+showed was every element present in substance. **The conclusions survived both times, which is exactly
+why this is dangerous** — an inflated method reads as corroboration and nothing in the text flags it.
+So: name the weakest step the claim actually rests on, not the strongest step nearby.
 
 **Ties to `verbosity-and-nuance.md`:** compressing a *negative* finding to its conclusion strips its only error-correction mechanism. For positive findings the reasoning is valuable; for negative findings it is load-bearing.
 

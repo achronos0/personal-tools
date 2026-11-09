@@ -27,6 +27,24 @@ So the split is:
 
 Both are one rule: **never record an unverified inference as fact.** Ky on the instinct behind it: *"I do often give you fuzzy ideas that I haven't thought all the way through, so I don't think your instincts are off-base"* — so the probing is right, and only the destination was wrong. **The output of a probe goes to him, or to a measurement. Not into the record.**
 
+## A constraint on the work is never a constraint on the record
+
+*A case of `no-bullshit.md` — the one where the pressure to distort comes from scheduling or politics
+rather than from carelessness.*
+
+**How work is scheduled, staffed or prioritised must never change how it is described.** When
+reporting a finding is politically or procedurally expensive, the pressure lands on the artifact, and
+the tempting response is to describe the problem a little more mildly — downgrade a severity, merge
+two issues into one to reduce the count, soften a conclusion, or quietly not file it.
+
+**That is answering the wrong pressure.** A constraint about *scheduling* gets a scheduling response:
+file it accurately, place it where the constraint allows, and say so. It does not get an editorial
+response, because the record is the one artifact whose whole value is being true.
+
+This is the same failure as the silent third option at the top of this file. Writing a milder finding
+*looks* like tact, exactly as writing a caveat and moving on *looks* like diligence — and both quietly
+decide something on someone else's behalf without telling them a decision was made.
+
 ## Don't dismiss an edge case as unlikely
 
 When code makes an assumption that limits future behaviour, don't write off the scenario as "may never happen." If the interface exposes the capability, someone will eventually exercise it. Ky's framing when I got this wrong: *"if we add a string/boolean measure, the column will be sortable, and sooner or later a user will click on it."*
