@@ -19,6 +19,26 @@ from a pass.**
 empty result, establish that it *could* have come out differently — mutation for a test, a positive
 control for a read, a deliberately-failing assertion for a new fixture.
 
+## A test is done when a mutant has failed it
+
+The silent-failure principle as a **definition of done**, set as a standing rule on a second machine
+after a feature shipped with nine green end-to-end tests and no evidence any of them could fail:
+
+- **Name the mutant** each new or changed test should catch — the specific breakage of the code it
+  guards, not "if it's wrong".
+- **Run the mutant, watch the test fail, restore.** Commit before mutating (`git-discipline.md`), or
+  restore from a copy with a non-interactive copy (`shell-environment.md`).
+- **Run it against a fresh build.** A test harness that reuses an already-running dev server tests the
+  server's *old* code, so the mutant never takes effect and the result says nothing about the test.
+  This is the silent-failure principle striking the check itself.
+- **Fix or delete** any test a relevant mutant doesn't fail. A test that can't fail is not partial
+  coverage; it is a false statement about coverage.
+- **Report which mutant each test catches** in the PR description, so the reviewer sees the evidence
+  rather than the claim.
+
+**Why it is a definition rather than a habit:** the person doing manual QA is relying on the suite. A
+green suite that can't fail transfers their confidence to nothing.
+
 ## Invent only what the case requires
 
 **Minimum fabrication is minimum audit burden.** Every fabricated element is a place the test can

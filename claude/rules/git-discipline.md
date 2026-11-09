@@ -22,6 +22,31 @@ Rough canonical order: schema/datasource additions → shared primitives → com
 
 **Honest history, not decorative splitting.** Layer commits only when the work really was self-contained and independently verifiable at each stage. If we implement-verify-commit in rounds, layer them. If the work happened as one intertwined push and only the tests came later, a two-commit "implementation → tests" split is honest; a manufactured three-way foundation/callers/cleanup split isn't, especially when the files span layers and can't be separated without hunk-picking. **Don't force artificial commits after the fact.**
 
+## PR granularity follows the cost of landing a PR
+
+Commits are free; **PRs are not, when each one carries a manual landing cost** — merge, wait for CI,
+cut a release, promote it, deploy. On a second machine, one debugging push produced eight narrow PRs in
+one repo and three in another, each needing that whole dance. In retrospect it should have been two or
+three.
+
+**So, under that condition, default to one PR per round of work, bundling unrelated fixes**, and split
+only when:
+
+- one change is **blocking a deploy** and the others aren't — ship the blocker alone, fast;
+- one is **materially riskier** than the rest (a hot path beside a cleanup), so it deserves its own
+  revert unit;
+- the changes **span repos** — one PR per repo, still bundled within each.
+
+Layering still applies *inside* the bundle: commits ordered foundation → application, so the reviewer
+can read it commit by commit. A bundled PR's description opens with a TL;DR covering the whole bundle
+(`verbosity-and-nuance.md`).
+
+**The condition that made it true:** the reviewer was the same person who ran every release, and
+already had full context from the session. **It reverses where review is shared** — several reviewers,
+each owning part of the code, are better served by narrow PRs they can each take whole, and the
+landing cost is spread across people rather than paid serially by one. Check which situation you are
+in rather than carrying either default between projects.
+
 ## Merge vs rebase: published → merge, unpublished → rebase
 
 Ky, after I rebased 23 commits onto a 4-commit drift on a PR that was already out for review: *"typically in this case I would have done a merge rather than a rebase. 23 commits is a lot of rebasing, and master wasn't that far behind."*

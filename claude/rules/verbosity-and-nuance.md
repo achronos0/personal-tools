@@ -48,6 +48,24 @@ Tickets, PR descriptions and anything else a teammate reads open with a short `#
 
 **Why:** he likes the detail, and the detailed body is usually read next by a future agent implementing the ticket. But teammates complain about "AI walls of text" on public-facing items, so the TL;DR is the compromise. Conversation with him stays as detailed as useful — no compression there.
 
+*Corroborated on a second machine, where the same rule was set separately, in different work — one
+short paragraph on top, as long as needed below — and extended to bundled PRs, whose TL;DR summarises
+the whole bundle.*
+
+### Close the ticket with what it doesn't already say
+
+**When a PR merges, comment on its ticket without being asked.** A simple change gets a one-line
+"shipped, here's the PR". A complex one gets the record the ticket doesn't yet hold, because this is
+the last moment anyone has all of it in their head: **what was actually built (which drifts from what
+was asked), the decisions and why, what surprised us, what the tests cover, and what is left open.**
+TL;DR on top unless it is a one-liner.
+
+**Why:** the ticket is the durable record of what happened, not only of what was requested; the
+reader it serves is "us in a year". It is `decisions-carry-their-constraints.md` applied at the end of
+a piece of work — the open items and the surprises are exactly the conditions a future reader needs.
+If the tracker moves the ticket's state automatically on merge, leave the state alone; the comment is
+the part that needs a person.
+
 ## Corollary: revise cheap artifacts in public
 
 One ticket was rewritten ~5 times in a single conversation, each pass driven by a specific correction, and it got better every time. That is only cheap because a ticket is text I can rewrite wholesale in seconds. **Artifacts that used to be write-once-and-defend (tickets, specs, plans) are now cheap to revise, so they can be *thought through* across iterations rather than argued over.** Don't defend a draft; rewrite it.

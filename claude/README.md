@@ -23,6 +23,54 @@ or the repo's own `AGENTS.md` / `CLAUDE.md`. And **nothing employer-related what
 system names, ticket keys, data, metrics, or internal process. Worked examples in these files are
 deliberately de-identified; keep it that way when editing.
 
+## Org-agnostic, and keeping it that way is the writer's job
+
+Ky's machines belong to **different employers**, and every file in `rules/` loads on all of them. So
+this is not a privacy nicety: a worked example carried verbatim from one machine puts that employer's
+systems into the context of a machine that belongs to another. Ky's instruction, set when the second
+machine was onboarded:
+
+> This repo must be org-agnostic and contain only general principles; it's on you to make that happen
+> in your updates.
+
+**"On you" means whoever is writing — Claude, on whichever machine.** Ky's read of the diff is a
+backstop, not the scrub. A rule that arrives here un-generalised has already failed, even if review
+catches it.
+
+### Why this is hard rather than mechanical
+
+The rules are only useful because of their worked examples, and **the examples are where the
+identifiers live.** There are two ways to get it wrong, and they pull in opposite directions:
+
+- **Keep the example verbatim** → the leak.
+- **Strip it to the bare principle** → the failure `rules/verbosity-and-nuance.md` describes: a rule
+  compressed to its conclusion loses the structure that makes it actionable, and nobody can apply it.
+
+The target is **generic but concrete**: keep the *shape* of what happened — the sequence of mistakes,
+the mechanism, the counts, the measured before/after — and replace the nouns.
+
+### How, in practice
+
+- **Name roles, not systems.** "An upstream service", "the identity provider", "the ticket tracker",
+  "a sharded fleet" — not product, service, repo, table or field names.
+- **Keep numbers that carry the lesson and identify nothing** ("8 narrow PRs where 2–3 would do",
+  "0 hits against 4"). Drop ticket keys, PR numbers, hostnames, account ids, user ids and emails.
+- **Separate the method from the verdict.** "Distrust *this* codebase" is a judgement about one
+  codebase and stays in that project's memory; "learn what a producer sends from the producer" is the
+  method, and comes here.
+- **Write "on a second machine" or "in other work"** where provenance matters, rather than naming the
+  project.
+- **Commit metadata is content too.** Author and committer emails are part of this repo; set this
+  repo's `user.email` to a personal address on every machine
+  (`git -C <clone> config user.email <personal address>`).
+
+### The same standard applies to any channel between machines
+
+If the sessions on two machines talk to each other directly — peer messaging, a shared doc, a relayed
+note — **that channel carries only what this repo could carry.** No org-specific example crosses it,
+even as context for a question; write the question the way the rule would be written. (Peer messaging
+between machines was tried on 2026-11-09 and didn't connect; git is the channel for now.)
+
 ---
 
 # Onboarding a machine
@@ -73,6 +121,12 @@ rules should become one file with sections, not many files that cross-reference 
 **If a machine's existing rule contradicts one here, stop and raise it with Ky.** A genuine
 disagreement between two accumulated rule sets is a finding about which one is wrong, not a merge
 conflict to resolve by precedence.
+
+**Raise a *possible* conflict too, not only a known one.** A rule promoted from one machine binds the
+others, where the practice it constrains may already be different. Onboarding the second machine, a
+new access rule ("my reach is what we'd accept losing") was flagged as possibly at odds with how the
+first machine works, before anyone knew whether it was; Ky confirmed that was the right call. The
+promoting machine can't see the other's practice, so the question is the only way it gets checked.
 
 ## Step 4 — scrub, and verify the scrub with a positive control
 

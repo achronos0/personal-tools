@@ -42,6 +42,15 @@ that: the spacing, the hyphen, the quoting, the plural.
 suspicious zero because they expected roughly N hits. I tend to accept the count, so the control has
 to do the work the intuition would.
 
+**The narrowing can be in the tool, not the pattern.** Claude Code's shell defines its own `grep`
+function, which runs ugrep with `--ignore-files` — it **honours `.gitignore`**. In a repo that keeps
+other checkouts in a gitignored directory, `grep -rl <symbol> --include='*.go' .` from the root
+returned **0**; `command grep` returned **4**; the same wrapper run from inside the nested checkout
+returned 4. Nothing about the pattern was wrong, and nothing in the output says files were skipped.
+So: **a zero from a recursive search near gitignored content is controlled with `command grep`, or by
+searching from inside the directory.** ripgrep, and tools built on it, also skip ignored files by
+default; check what a search tool skips before trusting its silence.
+
 ## A documented contract is still inference — generate the artifact
 
 A third source of false claims, alongside grep and stale references: reasoning from a documented rule instead of from the output.
@@ -74,6 +83,35 @@ Across one comparison project Ky challenged six of my claims. **All six were wro
 4. **An inherited assertion counts as unmeasured.** Two items carried "never observed in production data" from earlier work. Both were false when measured. Nobody had looked.
 5. **Don't rank by how alarming a mechanism reads.** Code-level severity was a poor predictor of impact in both directions.
 6. **Measure the *outcome*, not the *trigger*.** "How often does an input vary" (4.69%) answered a different question than "how often does the result differ" (1.54%).
+
+### Learn what a producer sends from the producer, never from your own copy
+
+A second machine, a different codebase, the same lesson. A service had been ingesting measurements
+from an upstream for two years, and everyone — Ky and I included — treated that intake as settled
+because it was old and quiet. It had been **silently dropping most of what the upstream sent**: a
+name filter in the ingestion loop kept the fields it recognised and discarded the rest, and nothing
+downstream could tell. Three wrong claims came out of one investigation before that was found:
+
+- **Inferring the upstream from our own stored data.** I wrote into a ticket that the upstream "doesn't
+  produce" a field, because our database never held it. **Our database is downstream of the filter
+  that dropped it** — the one place that question can never be answered. What a producer sends is
+  learned from the producer's code, or from raw payloads and logs captured before our code touches
+  them.
+- **Claiming impact without reading the consumer.** I said zero values from failed measurements broke
+  a downstream rule. The rule already skipped zeros. One file read would have stopped the claim.
+- **Treating age as evidence.** "Settled" meant "unexamined". **Old, quiet code has passed no test
+  that new code hasn't; it has only gone unobserved for longer.**
+
+**How to apply:** when something downstream looks wrong, walk the data path **from the producer
+inward**, reading the code at each hop, not outward from where the symptom showed up. At each hop,
+look for the **silent-drop shapes**: a `continue` in an ingestion loop, a lookup that skips unknown
+keys, an error downgraded to a warning that nothing alerts on. And before a conclusion goes into a
+ticket, verify it at its source — the consumer for an impact claim, the producer for a "what arrives"
+claim.
+
+This is "model BOTH sides from code" above, applied across a system boundary. How much to distrust a
+*particular* codebase is a judgement about that codebase and belongs in its own notes; the method is
+general.
 
 **Comments count as prose.** I once took a code comment's word that an endpoint returned 403 without opening the file; it was the frontend rendering its own error page. A comment is *more* persuasive than a grep hit because it reads like a conclusion someone already reached.
 
