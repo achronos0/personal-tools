@@ -49,5 +49,29 @@ Two consequences:
   re-checking then.
 - `trash <path>` moves to `~/.Trash` rather than deleting; `rmds` deletes `.DS_Store` recursively.
 
-**Maintenance note:** everything here is a measured property of a specific harness version, not of
-his dotfiles. If a shell-level surprise shows up, re-probe with `type` before trusting this file.
+## Expiry: this file is waiting on another machine's lived reality
+
+**The two halves of this file do not have the same confidence**, and the blanket caveat that used to sit
+here hid that.
+
+**Durable:** the git-shortcut table. It is read from `bin/macos_shell_helper.sh` in *this* repo, so it is
+exactly as current as that script and travels with it. A change there is the only thing that can
+invalidate it.
+
+**Provisional:** everything under "Other environment facts", plus the claim at the top that Claude Code's
+snapshot strips his aliases. All of it was measured on **one machine, in one session, on one harness
+version**. The generalisation — *that a Claude Code session never inherits his aliases* — is the part most
+likely to be wrong, because one machine cannot establish it.
+
+**The condition that settles it:** the first session on his other machine that probes `type` for these
+names, or that hits a shell-level surprise. That machine runs the same `.zshrc` and a possibly different
+Claude Code version, which is exactly the comparison this file needs and cannot make alone.
+
+**Until then, read the provisional half as "measured here, unconfirmed elsewhere."** On a contradiction,
+**rewrite rather than patch** — two machines disagreeing means the generalisation is wrong, not that one
+of them is an exception, and a patched caveat would preserve a claim that has already failed.
+
+This is the first rule here whose evidence base is **distributed on purpose**: the repo exists so another
+machine can contribute to it, and this file is the one actively waiting for that. See
+`decisions-carry-their-constraints.md` — a condition stated this way is checkable; "re-probe if something
+seems off" was a chore with no owner.
