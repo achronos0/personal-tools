@@ -42,6 +42,13 @@ LEAK_SHAPES = [
 
 MD_REF = re.compile(r"`([a-z0-9][a-z0-9-]*\.md)`")
 
+# Project memory layers specific instances on top of these rules and cites them by
+# full path (README: "Layer the specifics in project memory"). The full path is
+# the convention because a bare `foo.md` in a memory is ambiguous with the
+# project's own files (AGENTS.md, README.md, ...).
+MEMORY_RULE_REF = re.compile(r"~/\.claude/rules/([a-z0-9][a-z0-9-]*\.md)")
+MEMORY_REF_SAMPLE = ("see `~/.claude/rules/git-discipline.md` here", "git-discipline.md")
+
 # Positive control: every shape must still match a synthetic sample. A zero
 # result from the scan means nothing unless the patterns are proven live, and a
 # silently-broken regex is exactly the vacuous read these rules warn about.
@@ -59,7 +66,7 @@ SELF_TEST = {
     "slack webhook":     "hooks.slack.com/services/T0/B0/abc",
 }
 
-failures, warnings = [], []
+failures, warnings, notes = [], [], []
 
 
 def rule_files():
@@ -106,6 +113,45 @@ def check_orphans():
     return True
 
 
+def config_dir():
+    return os.environ.get("CLAUDE_CONFIG_DIR") or os.path.expanduser("~/.claude")
+
+
+def memory_files():
+    base = config_dir()
+    projects = os.path.join(base, "projects")
+    if not os.path.isdir(projects):
+        return []
+    out = []
+    for proj in sorted(os.listdir(projects)):
+        mem = os.path.join(projects, proj, "memory")
+        if os.path.isdir(mem):
+            out += [os.path.join(mem, f) for f in sorted(os.listdir(mem)) if f.endswith(".md")]
+    return out
+
+
+def check_memory_refs():
+    """Project memories citing a rule must cite one that exists. Machine-local:
+    each machine checks its own memories, so run this after any rule rename."""
+    found = MEMORY_RULE_REF.findall(MEMORY_REF_SAMPLE[0])
+    if found != [MEMORY_REF_SAMPLE[1]]:
+        failures.append("memory-ref pattern no longer matches its own sample")
+        return False
+    present, ok, refs, citing = set(rule_files()), True, 0, 0
+    for path in memory_files():
+        with open(path, encoding="utf-8") as fh:
+            names = MEMORY_RULE_REF.findall(fh.read())
+        refs += len(names)
+        citing += bool(names)
+        for ref in sorted(set(names)):
+            if ref not in present:
+                failures.append("project memory %s cites ~/.claude/rules/%s, which does not exist"
+                                % (os.path.relpath(path, config_dir()), ref))
+                ok = False
+    notes.append("%d project memories on this machine cite rules (%d references)" % (citing, refs))
+    return ok
+
+
 def check_shape_patterns_live():
     """Prove each leak pattern can still match before trusting that it found nothing."""
     ok = True
@@ -145,6 +191,7 @@ def main():
         ("leak patterns live",       check_shape_patterns_live),
         ("leak-shape scan",          check_leak_shapes),
         ("orphan report",            check_orphans),
+        ("memory -> rule refs",      check_memory_refs),
     ]
     print("checking %s\n" % RULES)
     for name, fn in checks:
@@ -154,6 +201,8 @@ def main():
     print("\n  %d rule files, %d bytes (~%d tokens loaded every session)"
           % (len(rule_files()), total, total // 4))
 
+    for n in notes:
+        print("  %s" % n)
     for w in warnings:
         print("\nwarn: %s" % w)
     for e in failures:

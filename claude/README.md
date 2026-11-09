@@ -180,6 +180,39 @@ Verify by starting a session and confirming the rules appear as global instructi
 Without this split the repo becomes a one-time snapshot that rots, because insights learned during
 project work land in project memory and never reach the other machine.
 
+## Layer the specifics in project memory
+
+*The first machine's idea; the second machine built it.* A rule here holds the principle and a
+de-identified worked example. **The specific instance — the real system, ticket, file, command —
+stays in that project's memory, as a thin layer that cites the rule.** One lesson, two layers:
+
+- **The rule** says what to do and why, in terms that hold anywhere.
+- **The project memory** says what that means *here*: "the rule's 'reused dev server' is this repo's
+  Playwright config, which reuses `:5173` outside CI." It does not restate the principle — a restated
+  principle drifts from the rule — it maps the rule onto this project.
+
+**Why both layers, not just the rule:**
+
+- **The de-identified example has lost the mapping a project session needs.** "An upstream service"
+  is the right thing to write here and useless when you're standing in the codebase wondering which
+  upstream. The layer gives it back, locally, where it can't leak.
+- **Some details are only actionable in one project** and have nowhere else to live. Onboarding the
+  second machine, deleting a fully-superseded memory threw one away (the `:5173` detail above) until
+  this idea recovered it. **When a rule absorbs a memory, trim the memory to its specific layer;
+  delete it only if nothing specific is left.**
+- **When a rule changes, its instances can be found and re-checked** — a revised rule may change what
+  an instance should say.
+- **It orders the scrub.** Write the specific instance first, then generalise a copy into the rule.
+  The original is never the thing being edited down.
+
+**How a memory cites a rule: the full path, `~/.claude/rules/<file>.md`.** A bare `<file>.md` in a
+memory is ambiguous with the project's own files (`AGENTS.md`, `README.md`). `check-rules.py` reads
+this machine's project memories and fails if a cited rule doesn't exist.
+
+**These links are one-way and machine-local.** A rule never cites a memory (that would be the leak),
+and each machine's memories are invisible to the other. So **after renaming or deleting a rule, run
+`check-rules.py` on each machine** — the other machine's broken citations only show up there.
+
 ## Governance: who approves a new rule
 
 **Interim rule (set 2026-11-09): surface every addition in-session and let Ky read the diff before
@@ -216,6 +249,10 @@ Run it after editing rules, and before any commit that touches them. It checks:
 - **leak-shape scan** — ticket-key, email, internal-hostname, private-IP, account-id and credential
   *shapes*. Deliberately shape-based, never name-based, for the reason in step 4. **Treat it as a
   tripwire, not as proof.**
+- **memory -> rule refs** — every `~/.claude/rules/<file>.md` cited from this machine's project
+  memories (under `$CLAUDE_CONFIG_DIR`, default `~/.claude`) must exist. Prints how many memories cite
+  rules, so a zero is visible. Machine-local by nature; see **Layer the specifics in project memory**.
+  Mutation-checked: a fixture memory citing a nonexistent rule makes it fail.
 - **orphan report** — warns when a rule is cited by no other. Informational: a leaf rule is fine; this
   just makes it a deliberate choice rather than an accident.
 
