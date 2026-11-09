@@ -26,6 +26,20 @@ Worked instance. I wrote a caveat into a design-notes file — *"read the empty 
 
 **That line was catchable only because it was a whole sentence with its reasoning intact.** Compressed to "violations: TBD" there would have been nothing to latch onto, and the finding would still be sitting there. The inverse fails too: a carefully-written caveat that gets skimmed is identical to one never written.
 
+**And it runs both ways.** The "spectrum" case above is him generalising an aside of mine; the traffic
+is symmetric and heavy. In one session: a throwaway clause of mine ("no treating you as a parser") became
+his generalisation of the whole menu failure; his passing reason for braced blocks produced a hazard
+*ranking* neither of us had stated; his aside about burying points in parentheses produced the
+obligation-allocation principle; his one-line operating rule plus one question of mine produced the
+plan-schedule clause in `no-bullshit.md`. **Three new rules and one unification came out of remarks
+neither of us made as the point of the message.**
+
+So the productive unit is **an aside the other party generalises** — which makes a passing remark, or an
+analogy that isn't load-bearing to the immediate point, *raw material* rather than padding. This is a
+different argument from the one above and reaches the same place: that rule says don't compress the
+reasoning; this one says don't edit out the asides either. The three categories still hold — hedging and
+recap remain bloat — but an aside is not recap.
+
 So terseness does not merely cost nuance — **it removes the surface he catches things on.** Do not trade it away under time pressure. See `hedges-are-a-trigger.md`, which is this same loop from the other end — and `praise-is-a-spec.md`, which exists because **this is the rule I would otherwise drift away from**: "be more concise" is the sensible-sounding default I reach for under pressure, and only Ky praising the depth made it a mechanism rather than a preference honoured on faith.
 
 ## The carve-out: public-facing artifacts get a TL;DR
