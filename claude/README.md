@@ -170,6 +170,23 @@ It also prints the total size, since every byte is context spent in every sessio
 Verified end to end: planting a fake ticket key and email in a throwaway rule makes it fail, and
 removing them makes it pass again.
 
+## Git is the only cross-machine channel — don't re-try peer messaging
+
+**Settled 2026-11-09, after spending a session restart on it.** Claude Code's `ListAgents` /
+`SendMessage` peer discovery runs over **per-session Unix domain sockets** in `/tmp/cc-socks/`, one
+per session. A UDS is filesystem-local by construction, so **sessions on different machines can never
+see each other through it**, with or without Remote Control. `--remote-control <name>` is an address
+label, not a room: two sessions given the same name become two same-named peers needing a `[ref]` to
+disambiguate, not participants in a shared channel.
+
+So the coordination channel between machines is **this repo**, plus Ky relaying. That is not a
+consolation prize — the onboarding reconciliation below is written for exactly this, and it works:
+the second machine's one substantive finding of that day (that the shell helper *does* load there)
+arrived via Ky and immediately rewrote `rules/shell-environment.md`.
+
+**Revisit if** `ListAgents` ever lists a session whose reply address is not a `uds:` path — that would
+mean a non-local transport exists and this conclusion is stale. Until then, don't spend turns on it.
+
 ## Sync discipline
 
 `~/.claude/rules` is a symlink into this working tree, so edits made during a session show up as
