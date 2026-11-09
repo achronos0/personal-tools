@@ -68,8 +68,8 @@ the mechanism, the counts, the measured before/after — and replace the nouns.
 
 If the sessions on two machines talk to each other directly — peer messaging, a shared doc, a relayed
 note — **that channel carries only what this repo could carry.** No org-specific example crosses it,
-even as context for a question; write the question the way the rule would be written. (Peer messaging
-between machines was tried on 2026-11-09 and didn't connect; git is the channel for now.)
+even as context for a question; write the question the way the rule would be written. (Today the only
+channel is this repo — see **Git is the only cross-machine channel** below.)
 
 ---
 
@@ -237,6 +237,14 @@ So the coordination channel between machines is **this repo**, plus Ky relaying.
 consolation prize — the onboarding reconciliation below is written for exactly this, and it works:
 the second machine's one substantive finding of that day (that the shell helper *does* load there)
 arrived via Ky and immediately rewrote `rules/shell-environment.md`.
+
+**The tools' own descriptions say otherwise, which is why the revisit condition matters.** On the
+second machine, `ListAgents` describes listing "Remote Control sessions on other machines" when
+Remote Control is connected, and `SendMessage` describes delivering to a session "on another machine".
+With `/remote-control` run in both sessions, neither appeared: `ListAgents` reported only local
+sessions, twice, and a send by the Remote Control name returned "not reachable", twice. So a remote
+path exists on paper and did not exist for us; the conclusion is about what we could reach, and the
+mechanism above is why the local path can't be it.
 
 **Revisit if** `ListAgents` ever lists a session whose reply address is not a `uds:` path — that would
 mean a non-local transport exists and this conclusion is stale. Until then, don't spend turns on it.
