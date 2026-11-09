@@ -1,5 +1,5 @@
 # Helpful MacOS zsh configuration
-# v2.3.3 2023-08-22
+# v2.4.0 2026-11-09
 
 ##############################
 #
@@ -69,6 +69,15 @@
 #    See next section for a list of commands.
 #    1 to enable, 0 to disable.
 #    Default: 1
+#
+# ==Non-interactive shells==
+#
+# When stdin is not a terminal (scripts, editor tasks, AI agents' shells), these options are
+# forced off, whatever HELPER_OPTIONS says: prompt, list_on_cd, friendly_commands,
+# helper_commands, nvm_autoload. They are for a person at a keyboard, and in a non-interactive
+# shell they do harm: `cp -iv` blocks on an overwrite prompt with nobody to answer it, the `cd`
+# listing pollutes captured output like $(cd dir && cmd), and the one-letter git helpers push or
+# delete on the remote if invoked by mistake. Colour, path, shell and cli_editor still apply.
 #
 # ==Helper commands==
 #
@@ -208,6 +217,15 @@ macos_shell_helper () {
 	done
 	unset HELPER_OPTIONS
 
+	# Keep the interactive conveniences out of non-interactive shells (see "Non-interactive shells")
+	if [[ ! -t 0 ]] ; then
+		OPT_PROMPT=0
+		OPT_LIST_ON_CD=0
+		OPT_FRIENDLY_COMMANDS=0
+		OPT_HELPER_COMMANDS=0
+		OPT_NVM_AUTOLOAD=0
+	fi
+
 	# Show colour output
 	if [[ "$OPT_COLOR" == "1" ]] ; then
 		export CLICOLOR=1
@@ -307,8 +325,10 @@ macos_shell_helper () {
 		alias mv='mv -iv'
 		alias mkdir='mkdir -pv'
 		alias less='less -FSRXc'
-		if [[ -x /usr/local/bin/ggrep ]] ; then
-			# If gnu coreutils is installed use its grep
+		if [[ $(whence ggrep) ]] ; then
+			# If GNU grep is installed (Homebrew package `grep`, not coreutils) use it.
+			# Found via PATH: a fixed /usr/local/bin path never matched Apple Silicon's /opt/homebrew.
+			# Note: --perl-regexp conflicts with -E ("conflicting matchers specified").
 			alias grep="GREP_COLORS='mc=01;31:fn=35' ggrep --color=auto --perl-regexp"
 			alias fgrep="GREP_COLORS='mc=01;31:fn=35' ggrep --color=auto --fixed-strings --ignore-case"
 		fi
