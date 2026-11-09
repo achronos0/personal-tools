@@ -119,9 +119,13 @@
 #    ga [files]
 #        Add files to staging, or all changed files if none provided.
 #        Like `git add` or `git add --all`.
-#    gb
+#    gb [pattern]
 #        List branches.
+#        With pattern, list only matching branches.
 #        Like `git branch --all`.
+#    gbl
+#        List local branches.
+#        Like `git branch`.
 #    gc '<message>'
 #        Commit and push staged changes.
 #        Like `git commit -m '<message>' && git push`.
@@ -386,7 +390,14 @@ macos_shell_helper () {
 			fi
 		}
 		gb () {
-			git branch --all
+			if [[ -z "$1" ]] ; then
+				git branch --all
+			else
+				git branch --all | grep "$1"
+			fi
+		}
+		gbl () {
+			git branch
 		}
 		gc () {
 			[[ -z "$1" ]] && (echo "Error: Missing commit message" >&2) && return 1

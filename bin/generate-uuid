@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+
+import { randomUUID } from 'crypto'
+
+run()
+
+function run() {
+    process.stdout.write(randomUUID() + '\n')
+}

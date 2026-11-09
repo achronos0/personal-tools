@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+
+run()
+
+function run() {
+	if (process.argv[2] && process.argv[2].match(/^--|^-h$/)) {
+		usage()
+		process.exit()
+	}
+    if (process.argv.length !== 3) {
+        die('exactly one argument is required', true)
+    }
+    const timestamp = parseInt(process.argv[2], 10)
+    if (isNaN(timestamp)) {
+        die('invalid timestamp', true)
+    }
+    const date = new Date(timestamp * 1000)
+    if (isNaN(date.getTime())) {
+        die('invalid date', true)
+    }
+    const formattedDate = date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    process.stdout.write(formattedDate + ' UTC\n')
+}
+
+function die (message, showUsage = false) {
+	process.stderr.write(`unix2date: ${message}\n`)
+	if (showUsage && process.stdout.isTTY) {
+		usage()
+	}
+	process.exit(1)
+}
+
+function usage () {
+	process.stdout.write("\nUsage: unix2date <unix-timestamp>\n\n")
+}
