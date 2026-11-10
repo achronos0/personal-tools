@@ -80,10 +80,22 @@ own initiative, and the read was denied. After he said to go ahead, the identica
 so did two further production reads he had not named individually, because they sat inside the check
 he had approved. Ky spotted the pattern across the two.
 
-**Both cases fit "deny until the person authorizes, then allow" at least as well as randomness, and
-two samples cannot tell them apart.** The discriminating test is a retry with *no* new authorization —
-which is exactly the unprompted retry this rule forbids, so it is a probe to run only if Ky authorizes
-it as one. Until then, hold both readings.
+**A third sample, deliberately gathered, and it is the strongest of the three.** Ky asked for it
+explicitly — *"do it, mostly because I want more evidence for our theory"* — on a **different kind of
+action**: a destructive git operation, where the first two were production reads. The identical
+command shape had been refused minutes earlier in the same session; after his go-ahead it succeeded,
+with nothing else changed.
+
+That matters because it **eliminates the obvious competing explanation**: that one particular guard
+was flaky. Two different guards now show the same deny → authorize → allow sequence, three for
+three.
+
+**It still is not proof, and the reason is worth keeping.** A non-deterministic classifier could
+produce three flips in the same direction; the probability is just poorer. **The discriminating test
+remains a retry with _no_ new authorization**, which is exactly the unprompted retry this rule
+forbids — so it is a probe to run only if Ky authorizes it as one, and authorizing it would destroy
+the thing being tested. Hold the authorization reading as the better-supported one, not the proven
+one.
 
 **What changes either way:**
 
