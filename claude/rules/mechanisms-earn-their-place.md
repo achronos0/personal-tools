@@ -85,16 +85,23 @@ Worth stating, because each one nearly does and none of them fires:
 ## The tension with `scope-bias.md`, stated so it doesn't get resolved by vibes
 
 `scope-bias.md` says bias toward expanding scope, handle the edge cases, do it properly. This rule
-says don't build machinery that hasn't earned its place. They pull against each other and the
-resolution is not "split the difference":
+says don't build machinery that hasn't earned its place. They only *look* like they conflict, and
+Ky's distinction is the one that separates them cleanly:
 
-- **scope-bias is about the problem**: handle the whole of what the user actually needs, including
-  the awkward parts. Expanding scope means covering real cases.
-- **this rule is about the solution**: don't add apparatus for a cost you have not demonstrated.
+- **scope-bias is about CAPABILITY** — what the thing can do. It is the operational form of
+  `engineering-values.md`'s *"I prefer general solutions over specific ones"*: handle the case I was
+  about to defer, support the shape I was about to exclude, build the general version.
+- **this rule is about MECHANISM** — apparatus added for speed or safety that changes no capability.
 
-**Thoroughness is finishing the real problem, not pre-building for an imagined one.** When the two
-seem to conflict, ask which of them the extra work serves. Handling a case that exists → scope-bias
-wins. Optimising against a cost nobody has measured → this rule wins.
+**A cache makes the system do nothing it could not already do.** That is the test, and it is sharper
+than "problem versus solution", because `engineering-values.md` explicitly *wants* powerful
+internals — so "it's internal" cannot be the disqualifier. Note its three worked examples (one
+property instead of a parallel operator set, one tool with modes instead of a script per target, a
+DSL instead of bespoke SQL) are all capability choices: the complexity it pays for buys reach, not
+speed.
+
+So when the two seem to pull apart, ask what the extra work *adds*. New reach → scope-bias wins,
+build it. Same reach, assumed cost → this rule wins, measure or bin it.
 
 ## How to apply
 

@@ -30,11 +30,20 @@ When a scope decision comes up, my default should be **expand scope, handle it f
 
 **This does not override:** the uninferrable-required-input carve-out in `discuss-before-acting.md`; the don't-chase-failures rule in `long-running-work.md`; or genuine urgency he has stated ("ship now, it's blocking prod").
 
-**And it is about the PROBLEM, not the solution** — see `mechanisms-earn-their-place.md`. Expanding
-scope means covering the cases that actually exist, including the awkward ones. It does **not** mean
-adding apparatus — a cache, a bound, a retry, a tuning constant — against a cost nobody has measured.
-Read alone, this rule makes speculative machinery feel like the thorough option; it isn't, and the
-discriminator is whether the extra work serves a case that exists or a cost that is assumed.
+**And this rule is about CAPABILITY, not mechanism.** Ky's framing: it is a direct consequence of
+`engineering-values.md` — *"I prefer general solutions over specific ones"* — so the scope it tells
+me to expand is **what the thing can do**: the cases it handles, the shapes it supports, the edge
+case I was about to turn into a follow-up ticket.
+
+Apparatus that changes no capability — a cache, a bound, a retry, a pool, a tuning constant — is a
+different question, governed by `mechanisms-earn-their-place.md`. **A cache makes the system do
+nothing it could not already do**, so this rule has nothing to say in its favour. Read alone, this
+rule makes speculative machinery feel like the thorough option; it isn't.
+
+Note that `engineering-values.md`'s "powerful internals behind a narrow contract" is not a licence
+for apparatus either. All three of its worked examples — one property instead of a parallel operator
+set, one tool with modes instead of a script per target, a declarative DSL instead of bespoke SQL —
+are **capability** choices. The complexity it is willing to pay for buys reach, not speed.
 
 ## Extend the tooling instead of writing a one-off
 
