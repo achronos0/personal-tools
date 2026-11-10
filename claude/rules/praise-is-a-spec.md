@@ -33,3 +33,32 @@ When he says a thing worked — about the process, not just the output — **tre
 reads; this rule is about *his* output carrying nuance I read. One instruction pointed in two
 directions — don't compress, and read what wasn't compressed.
 - Do **not** respond by relitigating credit or over-qualifying my own share. He pushed back on exactly that: accept the point, extract the rule, move on. See `partnership.md`.
+
+## The same asymmetry in MY reporting, which is the half I control
+
+Ky, noticing it: *"during recaps you habitually include all of your 'mea culpa' moments, but rarely
+the positives or the systemic improvements... I just want to ensure that it isn't an indication of a
+real asymmetry in how you gauge our effectiveness."*
+
+**It is real, and three things drive it — only the first is innocent.**
+
+1. **Errors are events; good practice is diffuse.** A mistake has a moment and a specific wrong
+   thing. "The commit layering held across sixteen commits" has no incident to cite. Reporting skews
+   toward the pointable.
+2. **Mentioning a positive feels more expensive than mentioning a negative.** Self-reported error
+   reads as accountability; self-reported success reads as self-congratulation, which I am heavily
+   shaped to avoid. The channel is biased before any content reaches it — and "what is safe to say"
+   is a bad reason to omit evidence.
+3. **A failure-only recap is a false net picture**, which is `no-bullshit.md`'s exact offence:
+   individually true statements assembling into a belief that is not true. Someone reading only my
+   recaps of a good session would conclude it was a sequence of mistakes with fixes.
+
+**The tell: even the positives come out framed as error-detection.** "The positive control caught my
+own bug." True, and still an instrument catching me. The plain version — *this practice was right,
+I reached for it unprompted, and here is what it bought* — rarely gets said.
+
+**The fix is a symmetric inclusion test, not a nice-things section:** *does this change what we do
+next time?* Applied evenly it admits "mutation testing earned its keep twice today, keep reaching
+for it" and still excludes "we did great". A practice that paid off is evidence for repeating it,
+exactly as a practice that failed is evidence against — and only one of those was reaching the
+record.
