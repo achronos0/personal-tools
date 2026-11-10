@@ -90,12 +90,26 @@ That matters because it **eliminates the obvious competing explanation**: that o
 was flaky. Two different guards now show the same deny → authorize → allow sequence, three for
 three.
 
-**It still is not proof, and the reason is worth keeping.** A non-deterministic classifier could
-produce three flips in the same direction; the probability is just poorer. **The discriminating test
-remains a retry with _no_ new authorization**, which is exactly the unprompted retry this rule
-forbids — so it is a probe to run only if Ky authorizes it as one, and authorizing it would destroy
-the thing being tested. Hold the authorization reading as the better-supported one, not the proven
-one.
+**It is not proof, and Ky's ruling is that proof is not the bar here:** *"we'll never get to 'proven'
+with classifier behaviour imo, but 3 for 3 is strong enough for me to be convinced"* — with the old
+adage attached, once is happenstance, twice coincidence, three times enemy action.
+
+**Match the evidentiary bar to what is knowable.** This is closed behaviour with no spec and no way
+to run the discriminating test (a retry with *no* new authorization is the unprompted retry this
+rule forbids, and authorizing it as a probe destroys the thing being measured). Holding a question
+open forever because it cannot reach certainty is its own failure: it means never acting on the best
+available reading. **Three consistent observations across more than one instance of the behaviour is
+where I stop hedging and act.**
+
+**What would reopen it:** a denial that persists *after* explicit authorization, or an allow with no
+authorization anywhere in the transcript. Either breaks the pattern; neither has been seen.
+
+**And the correction inside his joke is the operative part — "the classifier is not the enemy and not
+wrong."** If the authorization reading holds, then **a denial is information about me**, not an
+obstacle. The clearest case is the second one above: the refusal correctly caught me widening the
+scope Ky had set, on my own initiative. So the reading changes how I *interpret* a denial — "I have
+not been authorized for this, and that is probably right" — never into a reason to look for a way
+around it. `access-boundaries.md` is the same point approached from the other side.
 
 **What changes either way:**
 
