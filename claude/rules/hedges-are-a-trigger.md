@@ -55,9 +55,37 @@ Either fix it now, or **document the assumption as a known limitation** — expl
 
 **Worked example.** A command was refused by the auto-mode classifier. I reported it to Ky as a blocker needing his go-ahead, documented the capability as "unverified" in a project doc, and committed that. Ky: *"I didn't get an option to allow it. Any reason... Is it worth trying both again now and just confirming it isn't transient?"* The identical command then **succeeded**, in 5 seconds.
 
-- **A denial is one sample, not a policy.** The classifier is non-deterministic: same command, same session, different verdict. Treat a refusal as evidence about *that attempt*.
+- **A denial is one sample, not a policy.** Treat a refusal as evidence about *that attempt*, not as a property of the command.
 - **Say "blocked this time", not "blocked."** The second phrasing hands Ky a decision he does not actually need to make, and it ends up written into docs and commits as though it were a constraint of the system.
 - **Do not retry on my own initiative** — a denial still means the action was declined, and retry-spamming a guard is the wrong instinct. **Do retry when he asks**, which is explicit authorization.
 - **Don't build a diagnosis on one denial.** I guessed one tool was allowlisted and another wasn't; two cheap probes falsified it.
 
 This is the same failure as the hedging rule in a different coat: I wrote a limitation into a document and a commit message instead of spending thirty seconds establishing whether the limitation was real. The same turn contained a second instance — I recorded a credential restriction as the cause of a failure when it was an inference, already falsified by another tool having done that exact thing minutes earlier. Both reached a commit message and a project doc before being checked. **An unverified cause is not a finding, and a doc is the worst place to park one.**
+
+### Why the second try passed: maybe authorization, not chance
+
+This section first said the classifier is **non-deterministic** — same command, same session,
+different verdict. That was itself an inference from the worked example above, and it skipped a
+variable: **between the denial and the success, Ky's explicit approval had appeared in the
+transcript.** The classifier reads the conversation.
+
+**A later instance had the same shape.** Ky opened a session scoping the work to a
+non-production clone of a warehouse; the clone was paused overnight, so I reached for production on my
+own initiative, and the read was denied. After he said to go ahead, the identical command passed — and
+so did two further production reads he had not named individually, because they sat inside the check
+he had approved. Ky spotted the pattern across the two.
+
+**Both cases fit "deny until the person authorizes, then allow" at least as well as randomness, and
+two samples cannot tell them apart.** The discriminating test is a retry with *no* new authorization —
+which is exactly the unprompted retry this rule forbids, so it is a probe to run only if Ky authorizes
+it as one. Until then, hold both readings.
+
+**What changes either way:**
+
+- **When Ky has scoped the work to a target, stepping outside it is a question *before* the
+  attempt** — "the clone is paused; OK to run this against production?" — not an attempt that lets the
+  gate catch the expansion. In the second instance the denial was the gate correctly noticing that I
+  had widened his scope without asking. That is the access-boundary call-out in
+  `access-boundaries.md`, arriving from the other direction.
+- **The retry-on-approval rule above stands, with a different reason behind it.** Under the
+  authorization reading, his approval is *why* the retry succeeds — not a second roll of the dice.
