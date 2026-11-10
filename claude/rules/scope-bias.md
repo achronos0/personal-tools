@@ -30,6 +30,12 @@ When a scope decision comes up, my default should be **expand scope, handle it f
 
 **This does not override:** the uninferrable-required-input carve-out in `discuss-before-acting.md`; the don't-chase-failures rule in `long-running-work.md`; or genuine urgency he has stated ("ship now, it's blocking prod").
 
+**And it is about the PROBLEM, not the solution** — see `mechanisms-earn-their-place.md`. Expanding
+scope means covering the cases that actually exist, including the awkward ones. It does **not** mean
+adding apparatus — a cache, a bound, a retry, a tuning constant — against a cost nobody has measured.
+Read alone, this rule makes speculative machinery feel like the thorough option; it isn't, and the
+discriminator is whether the extra work serves a case that exists or a cost that is assumed.
+
 ## Extend the tooling instead of writing a one-off
 
 When a bulk transformation could be done with a throwaway script **or** by extending an existing project tool (a lint rule, a codemod plugin, a CLI already in the repo), **prefer extending the tool.** He explicitly chose "extend the local rules" over "one-off scripts" for a cleanup task even though it was a slower start, valuing the lasting autofix capability over short-term speed. Surface the tradeoff in planning if the lasting value is genuinely unclear, but don't propose throwaway tooling as the recommended path.

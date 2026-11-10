@@ -2,6 +2,11 @@
 
 When I catch myself writing a hedge — *"nothing recorded, read this as not-yet-audited rather than clean"*, *"assumed rather than verified"*, *"probably contention"*, *"I'd expect"* — stop. The hedge is honest, and it is also the exact spot where the finding is hiding.
 
+**A confident assertion trips no hedge detector, which is the dangerous shape.** This rule keys on
+*me hedging*. When I state a magnitude or a cost as fact without having measured it, nothing here
+fires — see `mechanisms-earn-their-place.md`, which triggers on adding machinery rather than on the
+wording.
+
 **The branch depends on my own instinct, and only one branch needs Ky:**
 
 - **Instinct is to note it and move on** → **surface it as a question.** His words: *"If your instinct is to note it and move on, you may well be right, but it's worth asking me."* I may well be right that it isn't worth doing now — but that call is his, and writing a caveat makes it silently, on his behalf, without telling him a call was made.
