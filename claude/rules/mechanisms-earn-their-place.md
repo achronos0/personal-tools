@@ -51,6 +51,28 @@ day and produce behaviour nobody can attribute — Ky's phrasing when he refused
 *"maybe when we add the 9th flag and the LRU actually fires, the contention causes mass 'random'
 slowdowns and nobody has a clue why."*
 
+## Corroborated on a second machine, in different work
+
+Two instances from before this rule existed, which fit it without adjustment:
+
+- **Retention nobody read.** Every request wrote a ~40-field diagnostic blob to a table — unbounded,
+  because the upsert key included an edit timestamp, so every edit spawned a new generation and
+  nothing swept them — mirrored into a second datastore, with a ~1,600-line viewer on top. Asked what
+  it bought, the answer was a reader count: **no production code read it.** Its one use was
+  diagnosing a single result, and an on-demand debugger that recomputes from the same builders gives
+  that — with today's answer instead of a snapshot of whatever the code did when the row was written.
+  Table, mirror, sync handlers and viewer were deleted; the capability survived and got better.
+  **"We might want to look at it later" is the assumed benefit of retention, and a reader count is
+  the cheap measurement.**
+- **The thorough fix that wasn't needed.** A stale cached render surfaced after an upstream renderer
+  changed its output size. I proposed the systemic fix: put a renderer version in the cache key. The
+  cheap proxies for a version — clear on every deploy, key on the upstream commit — fell to one number
+  from the upstream team: only ~30% of their merges change output, so either would discard mostly-valid
+  renders under load. Then Ky dropped versioning altogether: the upstream team clears the cache when
+  their change alters renders, through an admin button. This is the scope-bias pull described below:
+  version-keying *felt* like the thorough option, and it added no capability that a rare manual
+  clear doesn't provide.
+
 ## The second failure: refining the answer instead of re-opening the question
 
 I took three positions on the same mechanism — **document the risk**, then **bound it**, then

@@ -54,6 +54,8 @@ written as if for bash:
 - **An unmatched glob is an error** (`no matches found`), not a literal. Quote globs that may match
   nothing, or check first.
 - **`[` and `]` in a URL are glob characters** — pass `curl -g`, or quote the URL.
+- **A word starting with `=` expands to a command's path** (`=ls` → `/bin/ls`), so an unquoted
+  separator like `echo ====` fails with `=== not found`. Quote it.
 - **`path` is tied to `PATH`.** A function with `local path=…`
   replaces the command search path for its body, and everything in it fails with "command not found".
 
