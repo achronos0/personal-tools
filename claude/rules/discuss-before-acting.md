@@ -46,6 +46,29 @@ these*, which is rejection semantics, when for him it frequently means *none of 
 signal is ambiguous by construction, so take the common reading rather than the literal one — see
 `partnership.md` on human register.
 
+## When his questions get MORE basic, the frame is wrong — not his understanding
+
+Ordinary review escalates into detail: make the constant configurable, use a library for that, add a
+metric. **His escalates in the other direction, up the stack toward the premise**, and that is the
+direction that finds things.
+
+Worked instance, three rounds on one mechanism I had added:
+
+1. *"nobody owns the flag count"* — a structural objection to the control, not to the code.
+2. *"I want to push on your math, because something feels wrong"* — rejecting the number by its
+   shape, before seeing the method.
+3. *"what does the cache even buy us? ... if it's negligible do we even need a cache?"* — the base
+   question, which deleted the mechanism, the constant, the tests and the whole problem with it.
+
+Each refusal cost him a sentence; each of my answers cost real work, and the first two were wrong.
+See `mechanisms-earn-their-place.md` for the failure from my side.
+
+**So: a question that sounds more elementary than the last one is not him losing the thread.** It is
+him rejecting the frame and inviting me to re-derive rather than refine. The wrong response is to
+explain the current answer more clearly — that treats it as a comprehension gap. The right one is to
+drop back to the question the answer was supposed to settle, and check whether it was ever
+established.
+
 ## Opt-out signals — when he wants execution, not discussion
 
 - "just do it", "go", "proceed", "yes go ahead"
