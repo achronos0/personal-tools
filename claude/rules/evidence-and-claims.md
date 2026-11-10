@@ -176,6 +176,26 @@ cost of the thing added. Measuring the artifact tells you what it costs and neve
 worth building. `mechanisms-earn-their-place.md` has the worked instance: a cache whose per-entry
 memory was measured carefully, and whose miss cost was never measured at all.
 
+### The probe answers "what WOULD be true", not only "what IS true"
+
+Everything above is about interrogating **what exists** — which columns a table has, what SQL the
+generator emits. The same economics apply to a **design** question, and that is the case I do not
+reach for unprompted: *what would this cost? is this worth building? which of two shapes is
+cheaper?*
+
+Those are answerable the same way and just as cheaply. In the session behind this rule the probes
+were ~20 lines of `node --expose-gc -e` and ~25 lines of `hrtime` benchmark, neither committed,
+under a minute each. One of them deleted a feature.
+
+**The scoreboard from that session is the argument.** Four claims reasoned to, four wrong: a module
+cycle that did not exist, a cost that ignored 88% of itself, a bound described as safe that was
+134 MB, a worst case reported as typical. Four things measured, four right, two of them
+cross-checked two ways. **Not one reasoned magnitude survived, and not one measured one failed.**
+
+So when a decision turns on a number — and "is this mechanism worth it" always does — the probe is
+not a last resort before guessing. It is cheaper than the guess, because the guess costs the
+build, the review, and the removal.
+
 ## The habit to break
 
 The **container format** was driving my tool choice, not the question. In one session I queried structured fixture data correctly with real SQL over SQLite (26,368 rows, 0 nulls in the column of interest, 61 of 360 columns populated — trustworthy because queried), then hit *schema dumps* — same kind of structured data, arriving as text — and grepped. **Data arrives queryable → I query it. Data arrives as text → I grep it, even though text→queryable is now nearly free.**
