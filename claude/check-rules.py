@@ -19,6 +19,21 @@ import sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 RULES = os.path.join(ROOT, "rules")
+# Text that defends or dates a rule -- its evidence trail, how it was found, why
+# it is needed -- lives here, NOT in rules/, so it never loads at session start.
+# A rule points at its rationale file; the pointer is the only way to find it.
+RATIONALE = os.path.join(ROOT, "rationale")
+
+# Claude Code warns when the files loaded at session start exceed 150,000 chars
+# combined. Rules without `paths:` frontmatter load in every session, alongside
+# the project's own CLAUDE.md/AGENTS.md. 130,000 = 150,000 minus 20,000, the
+# largest launch-time project instruction file on the first machine (2026-11-11).
+# Revisit if the harness limit changes, or if a project either machine starts
+# sessions in has a bigger one -- the second machine's figure is not known yet.
+ALWAYS_ON_BUDGET = 130_000
+
+FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.S)
+RATIONALE_REF = re.compile(r"`rationale/([a-z0-9][a-z0-9-]*\.md)`")
 
 # Tokens matching a leak shape that are standard technical vocabulary, or are
 # obvious placeholders. A real ticket is never numbered 0000, so an all-zero
@@ -73,9 +88,31 @@ def rule_files():
     return sorted(f for f in os.listdir(RULES) if f.endswith(".md"))
 
 
-def read(f):
-    with open(os.path.join(RULES, f), encoding="utf-8") as fh:
+def rationale_files():
+    if not os.path.isdir(RATIONALE):
+        return []
+    return sorted(f for f in os.listdir(RATIONALE) if f.endswith(".md"))
+
+
+def read(f, base=RULES):
+    with open(os.path.join(base, f), encoding="utf-8") as fh:
         return fh.read()
+
+
+def all_docs():
+    """(label, text) for every file the org-agnostic standard applies to."""
+    return ([("rules/" + f, read(f)) for f in rule_files()]
+            + [("rationale/" + f, read(f, RATIONALE)) for f in rationale_files()])
+
+
+def split_frontmatter(text):
+    m = FRONTMATTER.match(text)
+    return (m.group(1), text[m.end():]) if m else ("", text)
+
+
+def is_path_scoped(f):
+    """A rule with `paths:` loads only when a matching file is read, not at launch."""
+    return re.search(r"(?m)^paths\s*:", split_frontmatter(read(f))[0]) is not None
 
 
 def check_only_markdown():
@@ -87,21 +124,37 @@ def check_only_markdown():
 
 def check_has_h1():
     ok = True
-    for f in rule_files():
-        lines = [ln for ln in read(f).splitlines() if ln.strip()]
+    for label, text in all_docs():
+        lines = [ln for ln in split_frontmatter(text)[1].splitlines() if ln.strip()]
         if not lines or not lines[0].startswith("# "):
-            failures.append("rules/%s has no top-level '# ' heading (truncated or corrupt write?)" % f)
+            failures.append("%s has no top-level '# ' heading (truncated or corrupt write?)" % label)
             ok = False
     return ok
 
 
 def check_links_resolve():
     present, ok = set(rule_files()), True
-    for f in rule_files():
-        for ref in sorted(set(MD_REF.findall(read(f)))):
+    for label, text in all_docs():
+        for ref in sorted(set(MD_REF.findall(text))):
             if ref not in present:
-                failures.append("rules/%s references `%s`, which does not exist" % (f, ref))
+                failures.append("%s references `%s`, which does not exist" % (label, ref))
                 ok = False
+    return ok
+
+
+def check_rationale_links():
+    """Rules point at rationale files, and every rationale file must be pointed at.
+    An unreferenced rationale file is lost: nothing at session start leads to it."""
+    present, ok, cited = set(rationale_files()), True, set()
+    for f in rule_files():
+        for ref in sorted(set(RATIONALE_REF.findall(read(f)))):
+            cited.add(ref)
+            if ref not in present:
+                failures.append("rules/%s points at `rationale/%s`, which does not exist" % (f, ref))
+                ok = False
+    for f in sorted(present - cited):
+        failures.append("rationale/%s is pointed at by no rule, so nothing will lead to it" % f)
+        ok = False
     return ok
 
 
@@ -172,15 +225,24 @@ def check_shape_patterns_live():
 
 def check_leak_shapes():
     ok = True
-    for f in rule_files():
-        for lineno, line in enumerate(read(f).splitlines(), 1):
+    for doc, text in all_docs():
+        for lineno, line in enumerate(text.splitlines(), 1):
             for label, pat in LEAK_SHAPES:
                 for m in pat.finditer(line):
                     if label == "ticket key" and SHAPE_ALLOW.match(m.group(0)):
                         continue
-                    failures.append("rules/%s:%d possible %s: %r" % (f, lineno, label, m.group(0)))
+                    failures.append("%s:%d possible %s: %r" % (doc, lineno, label, m.group(0)))
                     ok = False
     return ok
+
+
+def check_budget():
+    always = sum(len(read(f)) for f in rule_files() if not is_path_scoped(f))
+    if always > ALWAYS_ON_BUDGET:
+        warnings.append("always-on rules are %d chars, over the %d budget (see ALWAYS_ON_BUDGET "
+                        "for where it comes from); consolidate, or move defence to rationale/"
+                        % (always, ALWAYS_ON_BUDGET))
+    return True
 
 
 def main():
@@ -188,18 +250,28 @@ def main():
         ("only .md files in rules/", check_only_markdown),
         ("every rule has an H1",    check_has_h1),
         ("cross-references resolve", check_links_resolve),
+        ("rationale pointers",       check_rationale_links),
         ("leak patterns live",       check_shape_patterns_live),
         ("leak-shape scan",          check_leak_shapes),
         ("orphan report",            check_orphans),
         ("memory -> rule refs",      check_memory_refs),
+        ("always-on budget",         check_budget),
     ]
     print("checking %s\n" % RULES)
     for name, fn in checks:
         print("  %-28s %s" % (name, "ok" if fn() else "FAIL"))
 
-    total = sum(len(read(f)) for f in rule_files())
-    print("\n  %d rule files, %d bytes (~%d tokens loaded every session)"
-          % (len(rule_files()), total, total // 4))
+    # Characters, not bytes: the harness's limit is in characters, and the rules'
+    # em-dashes and curly quotes make bytes overstate it by about half a percent.
+    always = [f for f in rule_files() if not is_path_scoped(f)]
+    scoped = [f for f in rule_files() if is_path_scoped(f)]
+    a_chars = sum(len(read(f)) for f in always)
+    print("\n  %d always-on rules, %d chars (budget %d, ~%d tokens every session)"
+          % (len(always), a_chars, ALWAYS_ON_BUDGET, a_chars // 4))
+    print("  %d path-scoped rules, %d chars (load only on a matching read)"
+          % (len(scoped), sum(len(read(f)) for f in scoped)))
+    print("  %d rationale files, %d chars (never loaded at start)"
+          % (len(rationale_files()), sum(len(read(f, RATIONALE)) for f in rationale_files())))
 
     for n in notes:
         print("  %s" % n)
