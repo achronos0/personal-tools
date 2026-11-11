@@ -292,21 +292,23 @@ and each machine's memories are invisible to the other. So **after renaming or d
 
 ## Governance: who approves a new rule
 
-**Interim rule (set 2026-11-09): surface every addition in-session and let Ky read the diff before
-commit.** One line is enough — "I've added X to the rules because Y." He is not reviewing each rule
-on its merits; he is vetting a process that is genuinely novel.
+**Claude maintains this repo: writes, revises and commits rules without asking first.** Changes go
+through a pull request (see **Sync discipline**); Ky reviews the pull requests, and any question or
+concern he has is discussed there, as with any other review. Approval of an individual rule is not a
+step.
 
-**Ky's stated long-term intent is the opposite: this repo is Claude's to maintain**, written and
-committed without asking. The gate above exists only until the process has proven itself.
+**History, kept because it is the reason the pull request still matters.** From 2026-11-09 an interim
+gate required surfacing every addition in-session and Ky reading the diff before commit: he was
+vetting a process that was genuinely novel, not each rule on its merits, and his stated long-term
+intent was always that the repo be Claude's to maintain. The burden of proposing its retirement was
+placed on Claude, so it couldn't become permanent by inertia. Claude proposed retiring it after the
+size refactor, and **Ky retired it on 2026-11-11**: *"retire the interim rule, I'll review PRs and we
+can discuss about the PR if I have questions or concerns."*
 
-**The burden of retiring the gate is Claude's, not Ky's.** An interim measure with no review trigger
-becomes permanent by inertia, and the person who has to remember it is the one who didn't ask for
-it. So: once additions have been landing without needing correction, **propose retiring the gate**
-rather than waiting to be told.
-
-**Why the gate is not merely ceremony while it lasts:** a bad rule here is self-reinforcing in a way
-a bad project memory is not. It loads unconditionally, in every session, on every machine, and it
-shapes how everything else is read — including any later judgement about whether to revise it.
+**Why review is still worth having:** a bad rule here is self-reinforcing in a way a bad project
+memory is not. It loads unconditionally, in every session, on every machine, and it shapes how
+everything else is read — including any later judgement about whether to revise it. A pull request
+is the point where a second reader can catch one before it reaches the other machine.
 
 ## Checks
 
