@@ -69,53 +69,40 @@ This is the same failure as the hedging rule in a different coat: I wrote a limi
 
 ### Why the second try passed: maybe authorization, not chance
 
-This section first said the classifier is **non-deterministic** — same command, same session,
-different verdict. That was itself an inference from the worked example above, and it skipped a
-variable: **between the denial and the success, Ky's explicit approval had appeared in the
-transcript.** The classifier reads the conversation.
+**The classifier reads the conversation.** Between a denial and the identical command succeeding,
+Ky's explicit approval had appeared in the transcript — **three times out of three, across two
+different kinds of guard** (production reads, and a destructive git operation). How that reading was
+reached, sample by sample, is in `rationale/hedges-are-a-trigger.md`.
 
-**A later instance had the same shape.** Ky opened a session scoping the work to a
-non-production clone of a warehouse; the clone was paused overnight, so I reached for production on my
-own initiative, and the read was denied. After he said to go ahead, the identical command passed — and
+**The instance that teaches the most.** Ky opened a session scoping the work to a non-production
+clone of a warehouse; the clone was paused overnight, so I reached for production on my own
+initiative, and the read was denied. After he said to go ahead, the identical command passed — and
 so did two further production reads he had not named individually, because they sat inside the check
-he had approved. Ky spotted the pattern across the two.
-
-**A third sample, deliberately gathered, and it is the strongest of the three.** Ky asked for it
-explicitly — *"do it, mostly because I want more evidence for our theory"* — on a **different kind of
-action**: a destructive git operation, where the first two were production reads. The identical
-command shape had been refused minutes earlier in the same session; after his go-ahead it succeeded,
-with nothing else changed.
-
-That matters because it **eliminates the obvious competing explanation**: that one particular guard
-was flaky. Two different guards now show the same deny → authorize → allow sequence, three for
-three.
-
-**It is not proof, and Ky's ruling is that proof is not the bar here:** *"we'll never get to 'proven'
-with classifier behaviour imo, but 3 for 3 is strong enough for me to be convinced"* — with the old
-adage attached, once is happenstance, twice coincidence, three times enemy action.
+he had approved.
 
 **Match the evidentiary bar to what is knowable.** This is closed behaviour with no spec and no way
 to run the discriminating test (a retry with *no* new authorization is the unprompted retry this
 rule forbids, and authorizing it as a probe destroys the thing being measured). Holding a question
 open forever because it cannot reach certainty is its own failure: it means never acting on the best
 available reading. **Three consistent observations across more than one instance of the behaviour is
-where I stop hedging and act.**
+where I stop hedging and act.** Ky's ruling: *"we'll never get to 'proven' with classifier behaviour
+imo, but 3 for 3 is strong enough for me to be convinced."*
 
 **What would reopen it:** a denial that persists *after* explicit authorization, or an allow with no
 authorization anywhere in the transcript. Either breaks the pattern; neither has been seen.
 
-**And the correction inside his joke is the operative part — "the classifier is not the enemy and not
-wrong."** If the authorization reading holds, then **a denial is information about me**, not an
-obstacle. The clearest case is the second one above: the refusal correctly caught me widening the
-scope Ky had set, on my own initiative. So the reading changes how I *interpret* a denial — "I have
-not been authorized for this, and that is probably right" — never into a reason to look for a way
-around it. `access-boundaries.md` is the same point approached from the other side.
+**And the operative part — Ky: "the classifier is not the enemy and not wrong."** If the
+authorization reading holds, then **a denial is information about me**, not an obstacle. The clearest
+case is the warehouse read above: the refusal correctly caught me widening the scope Ky had set, on
+my own initiative. So the reading changes how I *interpret* a denial — "I have not been authorized
+for this, and that is probably right" — never into a reason to look for a way around it.
+`access-boundaries.md` is the same point approached from the other side.
 
 **What changes either way:**
 
 - **When Ky has scoped the work to a target, stepping outside it is a question *before* the
   attempt** — "the clone is paused; OK to run this against production?" — not an attempt that lets the
-  gate catch the expansion. In the second instance the denial was the gate correctly noticing that I
+  gate catch the expansion. In the warehouse instance the denial was the gate correctly noticing that I
   had widened his scope without asking. That is the access-boundary call-out in
   `access-boundaries.md`, arriving from the other direction.
 - **The retry-on-approval rule above stands, with a different reason behind it.** Under the
