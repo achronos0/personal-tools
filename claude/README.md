@@ -218,6 +218,12 @@ test `praise-is-a-spec.md` uses for recaps.
 - **Stays inline even though it looks like history:** a revisit condition I would need to recognise
   mid-session ("what would reopen it"), and an open agenda that is still awaiting a decision. Moving
   either out of sight is how it gets discovered rather than decided.
+- **Leaves the repo altogether:** anything that is one project's — its verdicts, its open agenda, its
+  systems — goes to that project's memory, citing the rule (**Layer the specifics in project
+  memory**). **`rationale/` is not an exit for it**: it is out of context, but it is in this repo, on
+  every machine. The first pass of the size refactor missed one: it kept a production-launch agenda
+  inline as "an open agenda awaiting a decision" without asking whose agenda it was; Ky pointed out it
+  was entirely one project's, and it moved to that project's memory.
 
 ### Three habits that keep it from growing back
 

@@ -51,9 +51,11 @@ the audit trail for everything before the change is ambiguous forever.
 
 ## The principle covers every system, not just logins
 
-Applied system by system, each with its verdict stated rather than left implicit — this is
-`decisions-carry-their-constraints.md`, since every one of these is "acceptable *today*, under a named
-condition":
+Apply it system by system, each with its verdict **and the condition that would change it** stated
+rather than left implicit — this is `decisions-carry-their-constraints.md`, since every verdict is
+"acceptable *today*, under a named condition". The verdicts belong to one project's setup and live in
+that project's memory; the general rule is to have them, each with its condition. **Worked
+instance**, from one machine:
 
 - **Infrastructure:** non-production only. When production exists, no production access — at most a
   tightly scoped read-only exception, decided explicitly.
@@ -67,20 +69,6 @@ condition":
 to.** Say what the access is and what it could reach, and let us decide together whether it meets the
 bar; record the decision and its condition. A read-only replica may well meet it. The failure is
 holding it silently.
-
-## What changes when production arrives
-
-Raised when the rule was set, and **not yet agreed** — they are my position, recorded so they get
-decided rather than discovered:
-
-- **Re-check every credential I hold.** A "dev" key widens silently if production comes to share its
-  host, cluster or identity project — nothing about the key changes, only what it reaches.
-- **A separate identity for me** — a machine user or app, no admin. A PR I open as the person can't be
-  approved by that person, and an admin identity bypasses branch protection unless that is disabled.
-- **Production deploy secrets behind required reviewers.** A branch push runs workflows that hold
-  secrets.
-- **My own identity everywhere**, for attribution and for revocation: you can't revoke "Ky, but only
-  when it's the agent".
 
 ## Tools whose blast radius is "any account"
 

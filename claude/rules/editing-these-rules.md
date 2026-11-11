@@ -10,6 +10,7 @@ by appending until they crossed it. The three habits that stop that:
   to both files while keeping both statements is how one idea came to be stated four times.
 - **A new corroboration updates the evidence line; its narrative goes to `claude/rationale/`.**
   Keep in the rule what changes what I do: the trigger, the reasoning, and one worked example good
-  enough to recognise the pattern. Move what only defends or dates the rule.
+  enough to recognise the pattern. Move what only defends or dates the rule. Anything that is one
+  project's goes to that project's memory instead — `rationale/` is still in this repo, on every machine.
 - **Never cut a worked example to save space.** A rule without its example reads as an unreasoned
   imperative, and either gets ignored or applied as a blanket. Cut restatement, not reasoning.
