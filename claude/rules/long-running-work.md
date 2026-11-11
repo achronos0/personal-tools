@@ -39,3 +39,42 @@ When a run reports e.g. "1 failed, 182 passed" but my output filtering doesn't s
 - If the count was clean before the change and the change is small and localized, trust that and **ask before another full run**.
 - If a search against a captured log finds no failure marker but the summary claims a failure, the likelier explanation is that the name is in a chunk I didn't capture — not that there's a hidden failure. Ask; don't rerun to chase it.
 - Prefer one targeted run over repeated full ones. If a specific file is suspect, run that file directly.
+
+## Run an independent investigation alongside the work, not before it
+
+Ky, after it paid off: *"good call on the fork+worktree for the search, that saved us precious time."*
+
+**The shape:** an urgent change was ready to build, and one question about it — *can this ambiguity
+actually fire on real data?* — needed a search harness over the real code and a copy of the data.
+The answer could change the write-up but not the code, which had a sensible default either way. So
+the search went to a forked agent **in its own git worktree**, and the implementation went ahead in
+the main checkout at the same time. The search finished while the tests were being written, and its
+numbers went straight into the PR description and the ticket.
+
+**When it applies — all three, or don't:**
+
+- **Independent:** the investigation's answer doesn't gate the next edit. If it would change what I
+  build, it isn't parallel work; it's the first step.
+- **Its output lands in a record**, not in the code under edit — a PR description, a ticket comment,
+  a decision for a person.
+- **It would otherwise block** — run serially, it is minutes of the person's time spent waiting.
+  This is the same argument as backgrounding a suite: the time is ours.
+
+**Why a worktree and not just a background agent in the same checkout:** a search harness is
+scratch code that has to live inside the module to call its internals. In the shared checkout it is
+an uncommitted file under my edits, at risk of being committed, swept up by `git add -A`, or
+compiled into my test runs. A worktree on a detached HEAD makes it impossible to tangle.
+
+**What a worktree does NOT isolate, which is the half that nearly bit:** it separates *files*, not
+*shared services*. In that session the test package's setup dropped and recreated a shared test
+database and flushed a shared Redis on every run — so the fork's scratch runs and my integration
+tests would have reset each other's state, even from separate trees. I held my database tests until
+the fork finished, and the fork's own first attempt did leave the template database half-built.
+**Before running two things in parallel, ask what they touch outside the tree:** databases,
+ports, caches, queues, a dev server, an external rate limit. Either give each its own, or
+serialise just the part that shares.
+
+**Brief the fork with the collision risks, not just the question.** "Work only in this worktree,
+never touch the main checkout, read-only against the data, no external calls" kept it safe; I
+missed the shared test database in the brief and caught it only by checking the package's test
+setup before my own run. That check belongs in the brief next time.
