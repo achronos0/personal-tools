@@ -1,5 +1,8 @@
 # A mechanism has to earn its place
 
+*Why the neighbouring rules don't already catch this, and where the examples came from:
+`rationale/mechanisms-earn-their-place.md`. Read it before revising this rule.*
+
 **Trigger: I am about to add machinery.** A cache, an index, a pool, a retry, a queue, a memo, a
 threshold, a tuning constant, a layer of indirection, a config knob. Anything whose justification is
 "this will be faster / safer / more robust" rather than "this is the feature".
@@ -51,9 +54,7 @@ day and produce behaviour nobody can attribute — Ky's phrasing when he refused
 *"maybe when we add the 9th flag and the LRU actually fires, the contention causes mass 'random'
 slowdowns and nobody has a clue why."*
 
-## Corroborated on a second machine, in different work
-
-Two instances from before this rule existed, which fit it without adjustment:
+## Two more shapes it takes
 
 - **Retention nobody read.** Every request wrote a ~40-field diagnostic blob to a table — unbounded,
   because the upsert key included an edit timestamp, so every edit spawned a new generation and
@@ -89,22 +90,10 @@ Note also that the first two answers were *both* responses to review pressure, a
 shaped to satisfy the objection rather than to settle the question. Answering the critique is not the
 same as answering the question.
 
-## Why the existing rules do not cover this
+## Capability vs mechanism: the tension with `scope-bias.md`, stated so it doesn't get resolved by vibes
 
-Worth stating, because each one nearly does and none of them fires:
-
-- **`hedges-are-a-trigger.md`** keys on *my own hedge* — "probably", "I'd expect", "assumed rather
-  than verified". Here I was confidently wrong: I wrote a magnitude down as fact. **A confident
-  assertion trips no hedge detector**, which makes this the more dangerous shape of the same error.
-- **`evidence-and-claims.md`** is method — how to establish something properly once I have decided
-  to. It does not supply the impetus to establish it, and its worked examples are reads of state
-  that already exists, not forward-looking "will this help".
-- **`discuss-before-acting.md`** would have caught it if I had classified "add a cache" as a
-  judgement call, but its examples are naming, structure and scope, and its remedy is *discuss*. The
-  missing step is earlier: deciding whether this needs discussing, measuring, or binning.
-- **`scope-bias.md` pushed the wrong way.** Bounding the cache *felt* like the thorough option.
-
-## The tension with `scope-bias.md`, stated so it doesn't get resolved by vibes
+*This is the one place the boundary is stated; `engineering-values.md` and `scope-bias.md` point
+here.*
 
 `scope-bias.md` says bias toward expanding scope, handle the edge cases, do it properly. This rule
 says don't build machinery that hasn't earned its place. They only *look* like they conflict, and
@@ -124,6 +113,10 @@ speed.
 
 So when the two seem to pull apart, ask what the extra work *adds*. New reach → scope-bias wins,
 build it. Same reach, assumed cost → this rule wins, measure or bin it.
+
+**Expect scope-bias to pull the wrong way here.** Read alone, it makes speculative machinery feel
+like the thorough option: bounding the cache, and version-keying the render cache above, both *felt*
+thorough. Neither added reach.
 
 ## How to apply
 

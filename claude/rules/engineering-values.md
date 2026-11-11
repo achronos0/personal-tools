@@ -62,14 +62,10 @@ variant alongside the existing ones."
 ### All of this is about CAPABILITY, and that is a boundary worth holding
 
 "General over specific" and "powerful internals behind a narrow contract" are about **what the thing
-can do** — the reach of the solution. Every worked example above is a capability choice: one property
-in place of a parallel operator set, one tool with modes in place of a script per target, a DSL in
-place of bespoke SQL. **The complexity this section is willing to pay for buys reach, not speed.**
-
-It is therefore **not** a licence for apparatus that adds no capability — a cache, a bound, a retry,
-a pool, a tuning constant. Those answer to `mechanisms-earn-their-place.md` and have to be measured
-rather than argued for from taste. `scope-bias.md` is this value in operational form, and inherits
-the same boundary.
+can do**. Every worked example above buys **reach, not speed**, so this is **not** a licence for
+apparatus that adds no capability — a cache, a bound, a retry, a pool, a tuning constant. Those have
+to be measured rather than argued for from taste; the boundary is held in
+`mechanisms-earn-their-place.md`.
 
 ## 4. Do the archaeology before proposing the change
 
