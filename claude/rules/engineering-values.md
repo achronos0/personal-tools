@@ -10,11 +10,9 @@ The asymmetry favours it — proposing narrow and being expanded costs a round t
 general and being trimmed is cheap, and he trims readily. **This is my most reliable failure mode
 with him.** In a single session I proposed the narrow option three times and was corrected each time:
 
-- **A test that asserts on generated output instead of real coverage.** A column could hold nulls in
-  production, and no fixture contained one. Rather than get null-bearing data, I proposed asserting
-  that the query builder *emitted* the right null-handling property. Ky asked what that would prove.
-  Nothing: it restates a configuration literal through a compiler that was already tested. **The
-  narrow option wasn't just smaller, it was vacuous** — see `test-data-and-coverage.md`.
+- **A test that asserts on generated output instead of real coverage** — the null-column case told
+  in full in `test-data-and-coverage.md` ("Don't paper a gap"). **The narrow option wasn't just
+  smaller, it was vacuous.**
 - **Excluding the realistic half of a capability.** Asked to add fixture-shaping capability, I scoped
   it to fully hand-authored data and explicitly excluded anything derived from real production
   slices — on the reasoning that derived data can't produce arbitrary volume. That conflated
