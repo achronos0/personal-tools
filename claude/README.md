@@ -7,8 +7,12 @@ reaches the others through git.
 ## Layout
 
 - `rules/` — global instruction files. Claude Code loads every `*.md` in `~/.claude/rules/`
-  automatically, in every session, in every project. No configuration needed: the directory's
-  presence is the wiring.
+  automatically, in every session, in every project, **unless** the file has `paths:` frontmatter,
+  in which case it loads only when a matching file is read (see **Writing a rule**). No
+  configuration needed: the directory's presence is the wiring.
+- `rationale/` — the evidence trail and history behind a rule: how it was found, why it is needed,
+  what it replaced. **Never loaded at session start.** Each file is named after its rule, and the
+  rule points at it in its first lines; the pointer is the only way to find it.
 
 This README lives *outside* `rules/` on purpose — anything inside that directory is loaded into
 context on every single session, so it holds only content meant for Claude to act on.
@@ -180,6 +184,73 @@ Verify by starting a session and confirming the rules appear as global instructi
 Without this split the repo becomes a one-time snapshot that rots, because insights learned during
 project work land in project memory and never reach the other machine.
 
+## Writing a rule: what is always-on, and what isn't
+
+`rules/editing-these-rules.md` is the always-loaded summary of this section, so that it is in front
+of whoever is about to edit a rule; this is the full version.
+
+### Why there is a budget
+
+Claude Code warns at session start when the instruction files it loads at launch exceed **150,000
+characters combined**. Launch-time files aren't truncated — the warning is a heuristic for "this much
+context may reduce adherence" — but the rules alone reached 136,786 characters on 2026-11-11 and put
+any project with a modest `AGENTS.md` over the line. They had grown from 81k to 137k in about two and
+a half days, entirely by appending.
+
+`check-rules.py` warns when always-on rules exceed `ALWAYS_ON_BUDGET` (130,000: the 150k limit minus
+the largest launch-time project instruction file on the first machine, 20k). The constant's comment
+says when to revisit it, including once the second machine's largest is known.
+
+### The test: does this sentence change what I do?
+
+The reader of a rule is Claude, in every session. So the test for keeping a sentence in an always-on
+rule is **whether it changes what Claude does in a session where it is loaded** — the same symmetric
+test `praise-is-a-spec.md` uses for recaps.
+
+- **Stays in the rule:** the trigger, the reasoning, and **at least one worked example good enough to
+  recognise the pattern.** A rule stripped to its conclusion reads as an unreasoned imperative: it is
+  either ignored or applied as a blanket, which is the failure `verbosity-and-nuance.md` describes
+  from the other side. **Never cut a worked example to save space.**
+- **Moves to `rationale/`:** text that only defends or dates the rule — the sample-by-sample evidence
+  trail, the history of earlier wrong readings, "why the neighbouring rules don't already cover
+  this", where an example came from. That is what you need when *revising* a rule, and revising
+  means opening the file, which is exactly where the pointer sits.
+- **Stays inline even though it looks like history:** a revisit condition I would need to recognise
+  mid-session ("what would reopen it"), and an open agenda that is still awaiting a decision. Moving
+  either out of sight is how it gets discovered rather than decided.
+
+### Three habits that keep it from growing back
+
+1. **A unification is a refactor, not a bridge.** When two rules turn out to be one idea, state it
+   once in the file that owns it and replace the other statements with a pointer. The capability vs
+   mechanism boundary had been stated four times, about 4,300 characters, because each unification
+   added a bridge sentence to both files and removed nothing.
+2. **A corroboration updates the evidence line.** "Three for three, across two kinds of guard" goes in
+   the rule; the narrative of the third sample goes to `rationale/`.
+3. **A consolidation carries a ledger.** Every passage removed from an always-on rule gets a line in
+   the commit message saying where it went: "now stated once in X", "moved to `rationale/Y`", or
+   "deleted because…". A deletion with no destination is visible on the page, which is what a reviewer
+   is checking for.
+
+**Why a pointer to a sibling rule loses nothing:** every always-on rule is in context at the same
+moment, so "told in full in `test-data-and-coverage.md`" puts the full telling one glance away at the
+point of use. That stops being true for a rule moved out of the always-on set; before path-scoping a
+rule, or making it a skill, check what points *into* it.
+
+### Path-scoped rules
+
+A rule with `paths:` frontmatter loads only when Claude reads, writes or edits a matching file. The
+patterns are relative to the session's primary working directory. Measured 2026-11-11 with canary
+words in headless sessions, against the two code-style rules: a `.go` read loaded neither, `.py`
+loaded the general rule only, `.ts` loaded both, and no read loaded neither. (Asking the model whether
+a rule was present, without a canary, was useless — it said yes to both after the `.go` read.)
+
+**The gap:** the rule arrives *with* the tool result, so the first `Write` of a brand-new file, in a
+session that has read no matching file yet, happens without it. Fit for rules about writing code in
+an existing codebase; wrong for anything dispositional, whose trigger is not a file type. If
+frontmatter fails to parse, Claude Code silently loads the rule everywhere, and the checker would
+still count it as path-scoped — so verify a new pattern with a canary rather than trusting the count.
+
 ## Layer the specifics in project memory
 
 *The first machine's idea; the second machine built it.* A rule here holds the principle and a
@@ -240,14 +311,20 @@ python3 claude/check-rules.py        # exit 0 = pass, 1 = problems
 Run it after editing rules, and before any commit that touches them. It checks:
 
 - **only `.md` files in `rules/`** — anything there is loaded every session.
-- **every rule has an H1** — catches a truncated or corrupt write.
+- **every rule has an H1** — catches a truncated or corrupt write. Found after any frontmatter, and
+  checked in `rationale/` too.
+- **rationale pointers** — every `` `rationale/<f>.md` `` a rule cites must exist, and every rationale
+  file must be cited by some rule: an unreferenced one is lost, since nothing at session start leads
+  to it.
+- **always-on budget** — warns when rules without `paths:` exceed `ALWAYS_ON_BUDGET`. The totals are
+  printed in characters (the harness's unit), split into always-on, path-scoped and rationale.
 - **cross-references resolve** — rules cite each other by filename, so those names *are* links and a
   rename breaks them silently. This is the check the tool was written for.
 - **leak patterns live** — each leak shape must still match a synthetic sample. A scan that finds
   nothing proves nothing unless its patterns are proven able to match; a silently-broken regex is
   precisely the vacuous read `rules/evidence-and-claims.md` warns about.
-- **leak-shape scan** — ticket-key, email, internal-hostname, private-IP, account-id and credential
-  *shapes*. Deliberately shape-based, never name-based, for the reason in step 4. **Treat it as a
+- **leak-shape scan** — over `rules/` and `rationale/` alike — ticket-key, email, internal-hostname,
+  private-IP, account-id and credential *shapes*. Deliberately shape-based, never name-based, for the reason in step 4. **Treat it as a
   tripwire, not as proof.**
 - **memory -> rule refs** — every `~/.claude/rules/<file>.md` cited from this machine's project
   memories (under `$CLAUDE_CONFIG_DIR`, default `~/.claude`) must exist. Prints how many memories cite
@@ -289,6 +366,13 @@ mean a non-local transport exists and this conclusion is stale. Until then, don'
 ## Sync discipline
 
 `~/.claude/rules` is a symlink into this working tree, so edits made during a session show up as
-uncommitted changes here. Commit and push them deliberately; pull on the other machine before
-starting work. One file per rule keeps merge conflicts rare and file-scoped — there is intentionally
+uncommitted changes here. **Changes go through a pull request**, like the rest of our work
+(`rules/git-discipline.md`) — Ky's call on 2026-11-11, to apply our discipline to our own tooling
+too, after the repo had been taking direct commits to `main`. Pull on the other machine before
+starting work.
+
+**What a pull request here does and doesn't gate:** because of the symlink, whatever branch is
+checked out on a machine is already live on that machine — review gates what reaches `main` and the
+other machine, not what the authoring machine is running. Switch back to `main` after opening the
+pull request if the change shouldn't be in effect locally until it merges. One file per rule keeps merge conflicts rare and file-scoped — there is intentionally
 no index file, since every rule is loaded regardless.
