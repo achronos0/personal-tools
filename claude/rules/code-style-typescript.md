@@ -1,3 +1,15 @@
+---
+# Loads only when a matching file is read, written or edited -- not at session
+# start. Measured 2026-11-11 with a canary rule: absent before a matching read,
+# present after. The rule arrives WITH the tool result, so the first Write of a
+# brand-new file, in a session that has read no matching file yet, happens
+# without it. Rare in an existing codebase (read before write); if it bites,
+# drop the frontmatter and the rule loads everywhere again. Patterns are
+# relative to the session's primary working directory.
+paths:
+  - "**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"
+---
+
 # TypeScript code style preferences
 
 **Scope: TypeScript only.** These are TS/JS nitpicks, not general code style — Ky works in other
