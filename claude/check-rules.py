@@ -24,12 +24,20 @@ RULES = os.path.join(ROOT, "rules")
 # A rule points at its rationale file; the pointer is the only way to find it.
 RATIONALE = os.path.join(ROOT, "rationale")
 
-# Claude Code warns when the files loaded at session start exceed 150,000 chars
-# combined. Rules without `paths:` frontmatter load in every session, alongside
-# the project's own CLAUDE.md/AGENTS.md. 130,000 = 150,000 minus 20,000, the
-# largest launch-time project instruction file on the first machine (2026-11-11).
-# Revisit if the harness limit changes, or if a project either machine starts
-# sessions in has a bigger one -- the second machine's figure is not known yet.
+# Claude Code warns when the instruction files loaded at session start exceed a
+# combined limit. The limit is NOT a constant: read from the v2.1.322 bundle, it
+# is max(120,000, 5% of the model's context window x chars-per-token), with 3
+# chars/token for current models (4 for a listed set of older ones). 150,000 is
+# what a 1M-token window gives; a 200k window gives the 120,000 floor. Counted:
+# User (these rules), Project, Local and Managed files. Not counted: auto-memory
+# (MEMORY.md). See README "Why there is a budget".
+#
+# 130,000 = 150,000 minus 20,000, the largest launch-time project instruction
+# file on the machine that set it (2026-11-11). The other machine's largest is
+# 17,446 (an AGENTS.md pulled in by a one-line CLAUDE.md import), so 20,000
+# covers both. Revisit if the harness formula changes, if a project either
+# machine starts sessions in has a bigger file, or if sessions move to a model
+# without a 1M window -- at the 120,000 floor these rules alone are over.
 ALWAYS_ON_BUDGET = 130_000
 
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.S)
