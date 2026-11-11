@@ -113,9 +113,11 @@ needs an expiry note for mocks.
 ## Don't paper a gap with fake coverage
 
 **The most portable rule here.** Don't write a test that *looks* like coverage over a gap it doesn't
-actually close. I once proposed asserting on generated output as a "cheap equivalent" to running
-against the real shapes; asked what it would prove, the honest answer was nothing — it restated a
-configuration literal through a compiler that was already tested. The same theatre: asserting a mock
+actually close. **Worked instance:** a column could hold nulls in production, and no fixture
+contained one. Rather than get null-bearing data, I proposed asserting that the query builder
+*emitted* the right null-handling property, as a "cheap equivalent" to running against the real
+shapes. Ky asked what that would prove. Nothing — it restated a configuration literal through a
+compiler that was already tested. The same theatre: asserting a mock
 was called with the right arguments instead of testing the integration, or snapshotting rendered
 markup instead of asserting behaviour.
 

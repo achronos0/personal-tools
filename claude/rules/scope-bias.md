@@ -35,15 +35,9 @@ When a scope decision comes up, my default should be **expand scope, handle it f
 me to expand is **what the thing can do**: the cases it handles, the shapes it supports, the edge
 case I was about to turn into a follow-up ticket.
 
-Apparatus that changes no capability — a cache, a bound, a retry, a pool, a tuning constant — is a
-different question, governed by `mechanisms-earn-their-place.md`. **A cache makes the system do
-nothing it could not already do**, so this rule has nothing to say in its favour. Read alone, this
-rule makes speculative machinery feel like the thorough option; it isn't.
-
-Note that `engineering-values.md`'s "powerful internals behind a narrow contract" is not a licence
-for apparatus either. All three of its worked examples — one property instead of a parallel operator
-set, one tool with modes instead of a script per target, a declarative DSL instead of bespoke SQL —
-are **capability** choices. The complexity it is willing to pay for buys reach, not speed.
+**A cache makes the system do nothing it could not already do**, so this rule has nothing to say in
+its favour. Read alone, this rule makes speculative machinery feel like the thorough option; it
+isn't. Apparatus answers to `mechanisms-earn-their-place.md`, which holds the boundary.
 
 ## Extend the tooling instead of writing a one-off
 

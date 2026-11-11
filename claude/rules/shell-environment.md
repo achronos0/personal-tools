@@ -1,5 +1,7 @@
 # Ky's shell environment
 
+*How this file reached its current shape, through three wrong readings: `rationale/shell-environment.md`. Read it before revising this file.*
+
 His zsh sources `personal-tools/bin/macos_shell_helper.sh`, which defines aliases and helper
 functions. **Since v2.4.0 of the helper (2026-11-09), its interactive conveniences stay out of my Bash
 tool on every machine:** when stdin is not a TTY — and Claude Code's shells never have one — the
@@ -61,7 +63,9 @@ written as if for bash:
 
 ## What his git shortcuts actually do
 
-These run in **his** terminal, not mine — the table is for reading what he tells me. Several of his
+These run in **his** terminal, not mine — the table is for reading what he tells me. It was read
+from `bin/macos_shell_helper.sh` in this repo, so it is exactly as current as that script; re-read the
+script rather than trusting the table if he mentions a shortcut that isn't here. Several of his
 one- to four-letter helpers are **write operations that reach the remote**. When he says "I ran
 `gca`", he has already pushed.
 
@@ -93,6 +97,8 @@ Two consequences:
 
 - **`EDITOR=nano`**, but Claude Code sets `GIT_EDITOR=true`, so an editor-opening git command is a
   no-op here rather than a hang. Still pass `-m` / `--no-edit` explicitly.
+  `GIT_EDITOR=true` was measured on both machines but is not explained by any mechanism we have
+  read, so re-check it after a major harness upgrade.
 - **His interactive `grep` becomes GNU grep wherever `ggrep` is on PATH** (Homebrew's `grep`
   package — not coreutils): `grep` gets `--perl-regexp`, and `fgrep` (and his `f` alias) becomes
   **case-insensitive**. Before v2.4.0 the gate was a fixed `/usr/local/bin/ggrep`, the Intel Homebrew
@@ -101,29 +107,3 @@ Two consequences:
   (`friendly_commands` is off there).
 - `ll` uses GNU `gls` where coreutils is installed (one machine has it, one doesn't).
 - `trash <path>` moves to `~/.Trash` rather than deleting; `rmds` deletes `.DS_Store` recursively.
-
-## How this file got here
-
-**Durable:** the git-shortcut table — read from `bin/macos_shell_helper.sh` in this repo, so exactly as
-current as that script. And the helper's own non-TTY guard, which travels with the repo, so it holds on
-any machine that sources it — `.zshrc` differences no longer matter.
-
-**Measured on both machines:** `GIT_EDITOR=true` in Claude Code's shell. Not explained by a mechanism
-we have read, so re-check after a major harness upgrade.
-
-**The sequence, kept because it is the lesson:**
-
-1. *"Claude Code's shell snapshot strips his aliases."* Wrong about the cause; generalised from one
-   machine. The snapshot strips nothing.
-2. *"This file is waiting on another machine's lived reality."* The archaeology question in
-   `engineering-values.md` then found the cause from inside one machine: a `[[ -t 0 ]] &&` guard on
-   that machine's `.zshrc` line. Cheaper than waiting.
-3. The second machine had no such guard, and everything bit there — a contradiction, so the file was
-   **rewritten rather than patched**, around the guard as the discriminator between machines.
-4. That rewrite said `cd` runs a `git fetch`. It doesn't — the wrapper calls `gi nofetch`; the claim
-   applied the table's row for bare `gi` without reading the wrapper's call (`evidence-and-claims.md`,
-   "trace the value, not the expression").
-5. **Then the fix moved to the source.** A per-machine `.zshrc` guard was the right diagnosis and the
-   wrong place for the remedy: it has to be remembered on every machine. The helper now guards itself,
-   and the discriminator became a one-line check. Same root-cause move as `engineering-values.md`:
-   once you know why two machines differ, remove the reason rather than document it.

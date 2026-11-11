@@ -1,3 +1,15 @@
+---
+# Path-scoped: see the comment in code-style-typescript.md for how it loads and
+# the one gap (the first Write of a new file before any matching read). The list
+# is the languages whose grammar allows a braceless body, plus Python for its
+# one-line `if` analogue; Go and Rust are left out because they can't get it
+# wrong. It does not reach code written in chat, a PR body or a shell heredoc;
+# if that starts to matter, drop the frontmatter.
+paths:
+  - "**/*.{c,h,cc,cpp,cxx,hh,hpp,cs,java,kt,kts,scala,groovy,dart,swift,php,py}"
+  - "**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"
+---
+
 # Code style preferences — all languages
 
 Cross-language preferences of Ky's. Language-specific nitpicks live in `code-style-<language>.md`

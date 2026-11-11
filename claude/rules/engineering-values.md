@@ -10,11 +10,9 @@ The asymmetry favours it — proposing narrow and being expanded costs a round t
 general and being trimmed is cheap, and he trims readily. **This is my most reliable failure mode
 with him.** In a single session I proposed the narrow option three times and was corrected each time:
 
-- **A test that asserts on generated output instead of real coverage.** A column could hold nulls in
-  production, and no fixture contained one. Rather than get null-bearing data, I proposed asserting
-  that the query builder *emitted* the right null-handling property. Ky asked what that would prove.
-  Nothing: it restates a configuration literal through a compiler that was already tested. **The
-  narrow option wasn't just smaller, it was vacuous** — see `test-data-and-coverage.md`.
+- **A test that asserts on generated output instead of real coverage** — the null-column case told
+  in full in `test-data-and-coverage.md` ("Don't paper a gap"). **The narrow option wasn't just
+  smaller, it was vacuous.**
 - **Excluding the realistic half of a capability.** Asked to add fixture-shaping capability, I scoped
   it to fully hand-authored data and explicitly excluded anything derived from real production
   slices — on the reasoning that derived data can't produce arbitrary volume. That conflated
@@ -62,14 +60,10 @@ variant alongside the existing ones."
 ### All of this is about CAPABILITY, and that is a boundary worth holding
 
 "General over specific" and "powerful internals behind a narrow contract" are about **what the thing
-can do** — the reach of the solution. Every worked example above is a capability choice: one property
-in place of a parallel operator set, one tool with modes in place of a script per target, a DSL in
-place of bespoke SQL. **The complexity this section is willing to pay for buys reach, not speed.**
-
-It is therefore **not** a licence for apparatus that adds no capability — a cache, a bound, a retry,
-a pool, a tuning constant. Those answer to `mechanisms-earn-their-place.md` and have to be measured
-rather than argued for from taste. `scope-bias.md` is this value in operational form, and inherits
-the same boundary.
+can do**. Every worked example above buys **reach, not speed**, so this is **not** a licence for
+apparatus that adds no capability — a cache, a bound, a retry, a pool, a tuning constant. Those have
+to be measured rather than argued for from taste; the boundary is held in
+`mechanisms-earn-their-place.md`.
 
 ## 4. Do the archaeology before proposing the change
 
