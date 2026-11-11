@@ -67,3 +67,41 @@ Ky, after I rebased 23 commits onto a 4-commit drift on a PR that was already ou
 2. **Excising something from history** — a leaked secret, a bad commit. No alternative.
 
 **Diagnostic before choosing** (this part was right and worth keeping): `git merge-tree $(git merge-base HEAD origin/master) HEAD origin/master` to see which files conflict, then `git log <base>..HEAD -- <those files>` to count how many of your commits touch them. Make a backup ref either way (`git branch -f backup/<name>-prerebase HEAD`). Note that the diagnostic informs the *cost*, not the *decision* — a published, human-reviewed branch merges even when the rebase would have been easy.
+
+## All of our work goes through a pull request
+
+Ky, stated as a general rule: **our changes always land through a pull request, even where branch
+rules would let us push directly** (an integration branch others push to, an unprotected branch, a
+repo with no review requirement).
+
+**Why, in his words, in order:** reviewability and CI. Mainly, it **enforces discipline on both of
+us: work goes out in changesets, each independently testable and reviewable.** In practice, the
+pull request's changes page is his preferred way to review code I write. A pull request as the
+shipping record (description, Testing section, ticket link) is a bonus, not the reason.
+
+**This constrains us, not the repo.** A project may allow direct pushes for other people (a release
+crew pushing an urgent fix to an integration branch, say), and documenting that is fine. It doesn't
+change what we do.
+
+## Every commit subject and PR title starts with its ticket
+
+Ky's preference: **every commit subject and every PR title starts with its ticket key, in the form
+`TICKET-NUM: Description`**, e.g. `<KEY>-123: Fix the knob offset`. That includes small follow-ups in
+the same work (a formatting fix, a test tweak).
+
+**Why (Ky): the key links a commit and its ticket both ways**, so history can answer both "which
+ticket gave rise to this work?" and "what work did this ticket cause?". Without the key, both
+questions go silent. I found the second one failing before I knew the reason: a command listing the
+tickets waiting on an integration branch, by reading keys out of commit subjects, silently missed
+two commits that named none. They were on the branch, and no ticket could find them.
+
+**Documentation-only changes are the exception: don't manufacture a ticket for them.** Ky doesn't want
+tickets created just to satisfy his own pattern. Instead, in order of preference:
+
+1. **Let the docs ride along** with another pull request, when one is going out anyway.
+2. **Reuse the ticket that gave rise to them**, whichever one it was.
+
+**For other work with no ticket yet**, file one or ask, before the first commit, and take the key from
+the tracker's response. Don't name a branch after a guessed number: I once named a branch for a ticket
+I was about to file, and the real key was off by eight. This is the uninferrable-input carve-out in
+`discuss-before-acting.md`, extended from branch and PR title to every commit.
