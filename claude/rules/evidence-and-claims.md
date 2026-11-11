@@ -169,14 +169,10 @@ So: name the weakest step the claim actually rests on, not the strongest step ne
 
 **Ties to `verbosity-and-nuance.md`:** compressing a *negative* finding to its conclusion strips its only error-correction mechanism. For positive findings the reasoning is valuable; for negative findings it is load-bearing.
 
-## Measure the baseline, not the artifact
+## The probe answers "what WOULD be true", not only "what IS true"
 
-When something is added to avoid a cost, the number that matters is **the cost it avoids**, not the
-cost of the thing added. Measuring the artifact tells you what it costs and never whether it was
-worth building. `mechanisms-earn-their-place.md` has the worked instance: a cache whose per-entry
-memory was measured carefully, and whose miss cost was never measured at all.
-
-### The probe answers "what WOULD be true", not only "what IS true"
+*Which number to measure — the cost avoided, not the cost of the thing added — is
+`mechanisms-earn-their-place.md` ("measure the baseline, not the artifact").*
 
 Everything above is about interrogating **what exists** — which columns a table has, what SQL the
 generator emits. The same economics apply to a **design** question, and that is the case I do not
@@ -200,12 +196,6 @@ build, the review, and the removal.
 
 The **container format** was driving my tool choice, not the question. In one session I queried structured fixture data correctly with real SQL over SQLite (26,368 rows, 0 nulls in the column of interest, 61 of 360 columns populated — trustworthy because queried), then hit *schema dumps* — same kind of structured data, arriving as text — and grepped. **Data arrives queryable → I query it. Data arrives as text → I grep it, even though text→queryable is now nearly free.**
 
-## One failure class, not three
-
-An **empty result that reads as an answer**, with no error raised:
-
-- A grep returning 0 and being reported as a finding.
-- An empty dimension table behind a `LEFT JOIN` degrading silently into one null row, pinned green by a snapshot.
-- A fabricated fixture row with one wrong foreign key producing an empty result that reads as a passing test.
-
-Same shape every time. **Treat a suspiciously empty result as a question about the method, not as data.**
+**A grep's zero, an empty join and a fixture with one wrong key are one failure class** — an empty
+result that reads as an answer. It is stated once, with the remedy, as the silent-failure principle
+in `test-data-and-coverage.md`.
