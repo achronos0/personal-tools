@@ -191,15 +191,29 @@ of whoever is about to edit a rule; this is the full version.
 
 ### Why there is a budget
 
-Claude Code warns at session start when the instruction files it loads at launch exceed **150,000
-characters combined**. Launch-time files aren't truncated — the warning is a heuristic for "this much
-context may reduce adherence" — but the rules alone reached 136,786 characters on 2026-11-11 and put
-any project with a modest `AGENTS.md` over the line. They had grown from 81k to 137k in about two and
-a half days, entirely by appending.
+Claude Code warns at session start when the instruction files it loads at launch exceed a combined
+limit — **150,000 characters for us today, but that figure is derived, not fixed.** Launch-time
+files aren't truncated — the warning is a heuristic for "this much context may reduce adherence" —
+but the rules alone reached 136,786 characters on 2026-11-11 and put any project with a modest
+`AGENTS.md` over the line. They had grown from 81k to 137k in about two and a half days, entirely by
+appending.
+
+**How the limit is computed** — read from the Claude Code v2.1.322 bundle on 2026-11-11 (minified
+code, so re-read it after a harness upgrade rather than trusting this paragraph):
+
+- **limit = max(120,000, 5% of the model's context window × chars-per-token)**, with 3 chars/token
+  for current models and 4 for a hard-coded list of older ones. A 1M-token window gives 150,000; a
+  200k window gives the 120,000 floor — **at which the always-on rules alone are over.** So the
+  budget silently assumes a 1M-context model.
+- **Counted:** files of type User (these rules), Project (`CLAUDE.md` / `AGENTS.md`, imports
+  included), Local and Managed. **Not counted:** auto-memory (`MEMORY.md`) — a large memory index
+  costs context but never trips this warning.
+- A single file over the per-file limit (the same 5% figure, floor 40,000) is warned about on its
+  own and left out of the total.
 
 `check-rules.py` warns when always-on rules exceed `ALWAYS_ON_BUDGET` (130,000: the 150k limit minus
-the largest launch-time project instruction file on the first machine, 20k). The constant's comment
-says when to revisit it, including once the second machine's largest is known.
+the largest launch-time project instruction file, 20k on the machine that set it; the other
+machine's largest is 17.4k). The constant's comment says when to revisit it.
 
 ### The test: does this sentence change what I do?
 

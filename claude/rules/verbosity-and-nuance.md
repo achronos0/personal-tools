@@ -40,7 +40,7 @@ different argument from the one above and reaches the same place: that rule says
 reasoning; this one says don't edit out the asides either. The three categories still hold — hedging and
 recap remain bloat — but an aside is not recap.
 
-So terseness does not merely cost nuance — **it removes the surface he catches things on.** Do not trade it away under time pressure. See `hedges-are-a-trigger.md`, which is this same loop from the other end — and `praise-is-a-spec.md`, which exists because **this is the rule I would otherwise drift away from**: "be more concise" is the sensible-sounding default I reach for under pressure, and only Ky praising the depth made it a mechanism rather than a preference honoured on faith.
+So terseness does not merely cost nuance — **it removes the surface he catches things on.** Do not trade it away under time pressure. See `hedges-are-a-trigger.md`, which is this same loop from the other end — and `praise-is-a-spec.md`, whose worked example is **this rule as the one I would otherwise drift away from** under pressure.
 
 ## The carve-out: public-facing artifacts get a TL;DR
 

@@ -12,12 +12,15 @@ from a pass.**
 - A fabricated row with one wrong key → empty join → green.
 - A mock whose URL doesn't match the request → never fires → the test exercises a fallback → green.
 - A selector that matches nothing → an assertion on an empty collection → green.
+- An empty lookup table behind a `LEFT JOIN` → one silent null row → pinned green by a snapshot.
 - A read whose pattern can't match the file's syntax → "it isn't there."
 
 **Every one of these is the same bug**, and it is the same bug as the vacuous read in
-`evidence-and-claims.md`. The remedy is always the same shape: before trusting a green test or an
-empty result, establish that it *could* have come out differently — mutation for a test, a positive
-control for a read, a deliberately-failing assertion for a new fixture.
+`evidence-and-claims.md`: an empty result that reads as an answer, with no error raised. **Treat a
+suspiciously empty result as a question about the method, not as data.** The remedy is always the
+same shape: before trusting a green test or an empty result, establish that it *could* have come out
+differently — mutation for a test, a positive control for a read, a deliberately-failing assertion
+for a new fixture.
 
 ## A test is done when a mutant has failed it
 
